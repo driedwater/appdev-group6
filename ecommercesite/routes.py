@@ -33,6 +33,7 @@ def login():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        
         flash(f'Account created for User {form.username.data}', 'info')
         return redirect('/login')
     return render_template('register.html', title='Register', form=form)
