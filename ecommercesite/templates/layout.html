@@ -41,11 +41,6 @@
                                     <ul>
                                         <li class="has-dropdown">
                                             <a href="{{ url_for('shop') }}">Shop</a>
-                                            <ul class="dropdown">
-                                                <li>
-                                                    <a href="single">Single Shop</a>
-                                                </li>
-                                            </ul>
                                         </li>
 
                                         <li>
@@ -53,11 +48,6 @@
                                         </li>
                                         <li class="has-dropdown">
                                             <a href="{{ url_for('services') }}">Services</a>
-                                            <ul class="dropdown">
-                                                <li>
-                                                    <a href="#">eCommerce</a>
-                                                </li>
-                                            </ul>
                                         </li>
                                         <li>
                                             <a href="{{ url_for('contacts')}}">Contact</a>
@@ -66,9 +56,14 @@
                                 </div>
                                 <div class="col-md-3 col-xs-4 text-right hidden-xs menu-2">
                                     <ul>
-                                        <Li><a href="{{url_for('login')}}">Login</a></Li>
-                                        <Li><a href="{{url_for('register')}}">Register</a></Li>
-                                        <li class="shopping-cart"><a href="#" class="cart"><span><small>0</small><i class="icon-shopping-cart"></i></span></a></li>
+                                        {% if current_user.is_authenticated %}
+                                            <Li><a href="{{url_for('logout')}}">Log Out</a></Li>
+                                            <li class="shopping-cart"><a href="{{url_for('cart')}}" class="cart"><span><small>0</small><i class="icon-shopping-cart"></i></span></a></li>
+                                        {% else %}
+                                            <Li><a href="{{url_for('login')}}">Login</a></Li>
+                                            <Li><a href="{{url_for('register')}}">Register</a></Li>
+                                        
+                                        {% endif %}
                                     </ul>
                                 </div>
                             </div>
