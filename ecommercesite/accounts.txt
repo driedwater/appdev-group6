@@ -1,0 +1,7 @@
+user account:
+email = email@example.com
+password = 12341234
+
+admin account:
+email = admin@example.com
+password = admintesting

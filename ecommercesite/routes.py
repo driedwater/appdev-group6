@@ -1,9 +1,31 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, abort
 from ecommercesite import app, bcrypt, db
 from ecommercesite.forms import LoginForm, RegistrationForm
-from ecommercesite.database import Customer
+from ecommercesite.database import Users
 from flask_login import login_user, current_user, logout_user, login_required
+from functools import wraps
 
+def admin_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if current_user.role == "admin":
+            return f(*args, **kwargs)
+        else:
+            abort(401)
+    return wrap
+
+#--------------------CUSTOM-ERROR-PAGE-------------------------#
+
+@app.errorhandler(401)
+def unauthorized(e):
+    return render_template('error/401.html'), 401
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('error/404.html'), 404
+
+#--------------------USER-PAGE--------------------------#
 
 @app.route('/')
 @app.route('/home')
@@ -32,9 +54,9 @@ def login():
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        customer = Customer.query.filter_by(email=form.email.data).first()
-        if customer and bcrypt.check_password_hash(customer.password, form.password.data):
-            login_user(customer)
+        user = Users.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user)
             next = request.args.get('next')
             return redirect(next) if next else redirect(url_for('home'))
         else:
@@ -53,8 +75,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hash_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        customer = Customer(first_name=form.first_name.data, last_name=form.last_name.data, username=form.username.data, email=form.email.data, password=hash_pw)
-        db.session.add(customer)
+        user = Users(first_name=form.first_name.data, last_name=form.last_name.data, username=form.username.data, email=form.email.data, password=hash_pw)
+        db.session.add(user)
         db.session.commit()
         flash(f'Account has been created, you can now login.', 'success')
         return redirect(url_for('login'))
@@ -64,3 +86,17 @@ def register():
 @login_required
 def cart():
     return render_template('cart.html', title='Shopping Cart')
+
+#---------------------ADMIN-PAGE------------------------#
+
+@app.route('/admin/dashboard')
+@login_required
+@admin_required
+def dashboard():
+    return render_template('/admin/dashboard.html', title='Dashboard')
+
+@app.route('/admin/add_product')
+@login_required
+@admin_required
+def add_product():
+    return render_template('/admin/add_product.html', title='Add Product')
