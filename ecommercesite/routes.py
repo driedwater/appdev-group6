@@ -86,6 +86,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
+
 def save_picture(form_pic):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_pic.filename)
@@ -124,7 +125,15 @@ def account():
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account', image_file=image_file, form=form)
 
-
+@app.route('/account/delete', methods=['POST'])
+@login_required
+def delete_account():
+    user = Users.query.filter_by(username=current_user.username).first()
+    db.session.delete(user)
+    db.session.commit()
+    flash('Your account has been deleted.', 'success')
+    return redirect(url_for('home'))
+    
 @app.route('/cart')
 @login_required
 def cart():
