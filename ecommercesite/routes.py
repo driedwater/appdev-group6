@@ -1,9 +1,12 @@
+import secrets, os
+from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from ecommercesite import app, bcrypt, db
 from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm
 from ecommercesite.database import Users
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
+
 
 def admin_required(f):
     @wraps(f)
@@ -59,8 +62,8 @@ def login():
             login_user(user)
             next = request.args.get('next')
             return redirect(next) if next else redirect(url_for('home'))
-    else:
-        flash('Login unsuccessful. Please check email and/or password.', 'danger')
+        else:
+            flash('Login unsuccessful. Please check email and/or password.', 'danger')
     return render_template('login.html', title='Login',form=form)
 
 @app.route('/logout')
@@ -83,11 +86,27 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
+def save_picture(form_pic):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_pic.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_pic)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateUserAccountForm()
     if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
         current_user.first_name = form.first_name.data
         current_user.last_name = form.last_name.data
         current_user.username = form.username.data
@@ -101,8 +120,10 @@ def account():
         form.last_name.data = current_user.last_name
         form.username.data = current_user.username
         form.email.data = current_user.email
+
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account', image_file=image_file, form=form)
+
 
 @app.route('/cart')
 @login_required

@@ -1,6 +1,7 @@
 from flask_login.mixins import UserMixin
 from wtforms import StringField, SubmitField
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from ecommercesite.database import Users
 from flask_login import current_user
@@ -32,6 +33,7 @@ class LoginForm(FlaskForm):
 class UpdateUserAccountForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
+    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     username =  StringField('Username', validators=[DataRequired(), Length(min=5, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Update')
