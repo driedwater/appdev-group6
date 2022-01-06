@@ -57,6 +57,7 @@
                                 <div class="col-md-3 col-xs-4 text-right hidden-xs menu-2">
                                     <ul>
                                         {% if current_user.is_authenticated %}
+                                            <Li><a href="{{url_for('account')}}">Account</a></Li>
                                             <Li><a href="{{url_for('logout')}}">Log Out</a></Li>
                                             <li class="shopping-cart"><a href="{{url_for('cart')}}" class="cart"><span><small>0</small><i class="icon-shopping-cart"></i></span></a></li>
                                         {% else %}
@@ -80,7 +81,8 @@
                             {% endif %}
                         {% endwith %}
                     </div>
-
+                </div>
+                <div>
                     {% block content %}
                     {% endblock content %}
                 </div>

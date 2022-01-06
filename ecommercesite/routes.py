@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, abort
 from ecommercesite import app, bcrypt, db
-from ecommercesite.forms import LoginForm, RegistrationForm
+from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm
 from ecommercesite.database import Users
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
@@ -59,8 +59,8 @@ def login():
             login_user(user)
             next = request.args.get('next')
             return redirect(next) if next else redirect(url_for('home'))
-        else:
-            flash('Login unsuccessful. Please check email and/or password.', 'danger')
+    else:
+        flash('Login unsuccessful. Please check email and/or password.', 'danger')
     return render_template('login.html', title='Login',form=form)
 
 @app.route('/logout')
@@ -74,6 +74,7 @@ def register():
         return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
+        print('this code is running')
         hash_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = Users(first_name=form.first_name.data, last_name=form.last_name.data, username=form.username.data, email=form.email.data, password=hash_pw)
         db.session.add(user)
@@ -81,6 +82,27 @@ def register():
         flash(f'Account has been created, you can now login.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    form = UpdateUserAccountForm()
+    if form.validate_on_submit():
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Your account has been updated.', 'success')
+        return redirect(url_for('account'))
+
+    elif request.method == 'GET':
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('account.html', title='Account', image_file=image_file, form=form)
 
 @app.route('/cart')
 @login_required

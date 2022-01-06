@@ -3,6 +3,7 @@ from wtforms import StringField, SubmitField
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from ecommercesite.database import Users
+from flask_login import current_user
 
 class RegistrationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
@@ -19,11 +20,30 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Username is taken.')
 
     def validate_email(self, email):
-        user = Users.query.filter_by(username=email.data).first()
+        user = Users.query.filter_by(email=email.data).first()
         if user:
-            raise ValidationError('Email is taken.')
+            raise ValidationError('email is taken.')
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = StringField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class UpdateUserAccountForm(FlaskForm):
+    first_name = StringField('First Name', validators=[DataRequired()])
+    last_name = StringField('Last Name', validators=[DataRequired()])
+    username =  StringField('Username', validators=[DataRequired(), Length(min=5, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Update')
+
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            user = Users.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError('Username is taken.')
+
+    def validate_email(self, email):
+        if email.data != current_user.email:
+            user = Users.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('email is taken.')
