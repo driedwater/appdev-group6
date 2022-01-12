@@ -25,12 +25,8 @@
 </div>
 
 <div class='container text-center'>
-    <p class="text-muted">
-        New to this site?
-    </p>
-    <p>
-        <a class="btn btn-primary"href="{{ url_for('register') }}">Create Account</a>
-    </p>
+    <small class="text-muted">
+        New to this site? Register <a class="ml-2" href="{{ url_for('register') }}">here</a>
+    </small>  
 </div>
-
 {% endblock content %}
