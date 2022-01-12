@@ -90,7 +90,6 @@ def services():
 def contacts():
     return render_template('contacts.html', title='Contacts')
 
-
 def save_picture(form_pic):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_pic.filename)
@@ -132,7 +131,7 @@ def account():
 @app.route('/account/delete', methods=['POST'])
 @login_required
 def delete_account():
-    user = Users.query.filter_by(username=current_user.username).first()
+    user = User.query.filter_by(username=current_user.username).first()
     db.session.delete(user)
     db.session.commit()
     flash('Your account has been deleted.', 'success')
@@ -142,6 +141,11 @@ def delete_account():
 @login_required
 def cart():
     return render_template('cart.html', title='Shopping Cart')
+
+@app.route('/checkout')
+@login_required
+def checkout():
+    return render_template('checkout.html', title='Checkout')
 
 #---------------------ADMIN-PAGE------------------------#
 
