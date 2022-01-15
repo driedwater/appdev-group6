@@ -38,7 +38,7 @@ class Users(User):
 
 
 class Staff(User):
-    product = db.relationship('Product', lazy=True)
+    product = db.relationship('Addproduct', lazy=True)
 
     __mapper_args__ = {
         'polymorphic_identity':'staff'
@@ -63,8 +63,8 @@ class Addproduct(db.Model):
     image_1 = db.Column(db.String(150), nullable=False, default='image1.jpg')
     image_2 = db.Column(db.String(150), nullable=False, default='image2.jpg')
     image_3 = db.Column(db.String(150), nullable=False, default='image3.jpg')
-    image_3 = db.Column(db.String(150), nullable=False, default='image4.jpg')
-    image_3 = db.Column(db.String(150), nullable=False, default='image5.jpg')
+    image_4 = db.Column(db.String(150), nullable=False, default='image4.jpg')
+    image_5 = db.Column(db.String(150), nullable=False, default='image5.jpg')
 
     def __repr__(self):
         return '<Post %r>' % self.name

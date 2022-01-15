@@ -4,13 +4,10 @@ from unicodedata import category
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
-from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm
+from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, Addproducts
 from ecommercesite.database import Staff, Users, User
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
-from .productform import Addproducts
-from templates import app,db,photos
-
 
 
 def admin_required(f):
