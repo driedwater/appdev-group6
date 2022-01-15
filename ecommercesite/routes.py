@@ -1,11 +1,16 @@
+from ast import Add
 import secrets, os
+from unicodedata import category
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort
+from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
 from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm
 from ecommercesite.database import Staff, Users, User
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
+from .productform import Addproducts
+from templates import app,db,photos
+
 
 
 def admin_required(f):
@@ -151,12 +156,29 @@ def checkout():
 
 @app.route('/admin/dashboard')
 @login_required
-@admin_required
+#-- @admin_required --#
 def dashboard():
     return render_template('/admin/dashboard.html', title='Dashboard')
 
-@app.route('/admin/add_product')
-@login_required
-@admin_required
+@app.route('/admin/add_product', methods=['POST', 'GET'])
+@login_required 
+#--@admin_required --#
 def add_product():
-    return render_template('/admin/add_product.html', title='Add Product')
+    form = Addproducts(request.form)
+    if request.method=="POST" and 'image_1' in request.files:
+        name = form.name.data
+        description = form.description.data
+        category = request.form.get('category')
+        price = form.price.data
+        stock = form.stock.data
+        image_1 = photos.save(request.files.get('image_1'), name=secrets.token_hex(10) + ".")
+        image_2 = photos.save(request.files.get('image_2'), name=secrets.token_hex(10) + ".")
+        image_3 = photos.save(request.files.get('image_3'), name=secrets.token_hex(10) + ".")
+        image_4 = photos.save(request.files.get('image_4'), name=secrets.token_hex(10) + ".")
+        image_5 = photos.save(request.files.get('image_5'), name=secrets.token_hex(10) + ".")
+        addproduct = Addproducts(name = name, description = description, category_id = category, price = price, stock = stock, image_1 = image_1, image_2 = image_2, image_3 = image_3, image_4 = image_4, image_5 = image_5)
+        db.session.add(addproduct)
+        flash(f'The product {name} was added in database','success')
+        db.session.commit()
+        return redirect(url_for('/admin/add_product'))
+    return render_template('admin/add_product.html', form=form, title='Add a Product')

@@ -1,3 +1,73 @@
 {% extends 'layout.html' %}
-{$ block content $}
+{% block content %}
+
+<div class="container tm-mt-big tm-mb-big">
+    <div class="row">
+          <div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
+            <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+              <div class="row">
+                <div class="col-12">
+                  <h2 class="tm-block-title d-inline-block">Add Product</h2>
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                <div>
+
+                    <div class="row tm-edit-product-row">
+                        <div class="col-xl-6 col-lg-6 col-md-12">
+                          <form action="" class="tm-edit-product-form">
+
+                            <div class="form-group mb-3">
+                                <label for="name">Product Name</label>
+                                {{ form.name(class="form-control") }}
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="name">Product Description</label>
+                                {{ form.description(class="form-control", rows="10") }}
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="category">Category</label>
+                                <select name="category" id="category" class="form-control" required>
+                                    <option selected>Select category</option>
+                                    <option value="1">New Arrival</option>
+                                    <option value="2">Most Popular</option>
+                                    <option value="3">Chair</option>
+                                    <option value="4">Table</option>
+                                    <option value="5">Cabinet</option>
+                                    <option value="6">Door</option>
+                                    <option value="7">Bed</option>
+                                    <option value="8">Decoration</option>
+                                </select>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="form-group mb-3 col-xs-12 col-sm-6">
+                                    <label for="price">Price</label>
+                                    {{ form.price (class="form-control") }}
+                                  </div>
+          
+                                  <div class="form-group mb-3 col-xs-12 col-sm-6">
+                                    <label
+                                      for="stock">Stock</label>
+                                      {{ form.stock (class="form-control") }}
+                                  </div>
+                            </div>
+                        </div>
+
+                            <div class="form-group mb-3">
+                            <label for="name">Product Images</label>
+                            {{ form.image_1(onchange="showPreview(event);") }}
+                            {{ form.image_2(onchange="showPreview(event);") }}
+                            {{ form.image_3(onchange="showPreview(event);") }}
+                            {{ form.image_4(onchange="showPreview(event);") }}  
+                            {{ form.image_5(onchange="showPreview(event);") }}
+                            </div>
+             
+                <p><input type="submit" value="{% if getproduct %}Update {% else %}Add{% endif %} product" class="btn btn-primary btn-block mx-auto">
+                </form>
+            </div>
+      <div class="col-md-1"></div>
+    </div>
+</div>
 {% endblock content %}

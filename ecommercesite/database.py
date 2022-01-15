@@ -1,5 +1,6 @@
 from ecommercesite import db, login_manager
 from flask_login import UserMixin
+from datetime import datetime
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -47,11 +48,35 @@ class Staff(User):
         return f"User('{self.username}', '{self.email}')"
 
 
-class Product(db.Model):
+class Addproduct(db.Model):
+    __seachbale__ = ['name','desc']
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    image_file = db.Column(db.String(20), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    staff_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'),nullable=False)
+    category = db.relationship('Category',backref=db.backref('categories', lazy=True))
+    price = db.Column(db.Numeric(10,2), nullable=False)
+    stock = db.Column(db.Integer, nullable=False)
+    pub_date = db.Column(db.DateTime, nullable=False,default=datetime.utcnow)
+
+
+    image_1 = db.Column(db.String(150), nullable=False, default='image1.jpg')
+    image_2 = db.Column(db.String(150), nullable=False, default='image2.jpg')
+    image_3 = db.Column(db.String(150), nullable=False, default='image3.jpg')
+    image_3 = db.Column(db.String(150), nullable=False, default='image4.jpg')
+    image_3 = db.Column(db.String(150), nullable=False, default='image5.jpg')
+
+    def __repr__(self):
+        return '<Post %r>' % self.name
+    
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), unique=True, nullable=False)
+
+    def __repr__(self):
+        return '<Catgory %r>' % self.name
+
 
 db.create_all()
+
