@@ -161,7 +161,7 @@ def save_product_picture(form_pic):
     random_hex = secrets.token_hex(10)
     _, f_ext = os.path.splitext(form_pic.filename)
     picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+    picture_path = os.path.join(app.root_path, 'static/product_pics', picture_fn)
 
     output_size = (945, 945)
     i = Image.open(form_pic)
@@ -189,6 +189,6 @@ def add_product():
         add_product = Addproducts(name = name, description = description, category_id = category, price = price, stock = stock, image_1 = image_1, image_2 = image_2, image_3 = image_3, image_4 = image_4, image_5 = image_5)
         db.session.add(add_product)
         db.session.commit()
-        flash(f'The product {name} has been added to database','success')
+        flash(f'The product {name} has been added to database!','success')
         return redirect(url_for('add_product'))
     return render_template('admin/add_product.html', form=form, title='Add a Product')
