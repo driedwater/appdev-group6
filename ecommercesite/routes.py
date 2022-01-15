@@ -4,8 +4,8 @@ from unicodedata import category
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
-from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, Addproducts
-from ecommercesite.database import Staff, Users, User
+from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm
+from ecommercesite.database import Staff, Users, User, Addproducts
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 
@@ -157,25 +157,38 @@ def checkout():
 def dashboard():
     return render_template('/admin/dashboard.html', title='Dashboard')
 
+def save_product_picture(form_pic):
+    random_hex = secrets.token_hex(10)
+    _, f_ext = os.path.splitext(form_pic.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+
+    output_size = (945, 945)
+    i = Image.open(form_pic)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+
 @app.route('/admin/add_product', methods=['POST', 'GET'])
 @login_required 
 #--@admin_required --#
 def add_product():
-    form = Addproducts(request.form)
+    form = AddproductForm()
     if request.method=="POST" and 'image_1' in request.files:
         name = form.name.data
         description = form.description.data
         category = request.form.get('category')
         price = form.price.data
         stock = form.stock.data
-        image_1 = photos.save(request.files.get('image_1'), name=secrets.token_hex(10) + ".")
-        image_2 = photos.save(request.files.get('image_2'), name=secrets.token_hex(10) + ".")
-        image_3 = photos.save(request.files.get('image_3'), name=secrets.token_hex(10) + ".")
-        image_4 = photos.save(request.files.get('image_4'), name=secrets.token_hex(10) + ".")
-        image_5 = photos.save(request.files.get('image_5'), name=secrets.token_hex(10) + ".")
-        addproduct = Addproducts(name = name, description = description, category_id = category, price = price, stock = stock, image_1 = image_1, image_2 = image_2, image_3 = image_3, image_4 = image_4, image_5 = image_5)
-        db.session.add(addproduct)
-        flash(f'The product {name} was added in database','success')
+        image_1 = save_product_picture(request.files.get('image_1'))
+        image_2 = save_product_picture(request.files.get('image_2'))
+        image_3 = save_product_picture(request.files.get('image_3'))
+        image_4 = save_product_picture(request.files.get('image_4'))
+        image_5 = save_product_picture(request.files.get('image_5'))
+        add_product = Addproducts(name = name, description = description, category_id = category, price = price, stock = stock, image_1 = image_1, image_2 = image_2, image_3 = image_3, image_4 = image_4, image_5 = image_5)
+        db.session.add(add_product)
         db.session.commit()
-        return redirect(url_for('/admin/add_product'))
+        flash(f'The product {name} has been added to database','success')
+        return redirect(url_for('add_product'))
     return render_template('admin/add_product.html', form=form, title='Add a Product')

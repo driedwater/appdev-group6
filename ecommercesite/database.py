@@ -38,7 +38,7 @@ class Users(User):
 
 
 class Staff(User):
-    product = db.relationship('Addproduct', lazy=True)
+    temporary = db.Column(db.Integer, nullable=True)
 
     __mapper_args__ = {
         'polymorphic_identity':'staff'
@@ -48,8 +48,8 @@ class Staff(User):
         return f"User('{self.username}', '{self.email}')"
 
 
-class Addproduct(db.Model):
-    __seachbale__ = ['name','desc']
+class Addproducts(db.Model):
+    __seachbale__ = ['name','description']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.Text, nullable=False)
@@ -58,13 +58,11 @@ class Addproduct(db.Model):
     price = db.Column(db.Numeric(10,2), nullable=False)
     stock = db.Column(db.Integer, nullable=False)
     pub_date = db.Column(db.DateTime, nullable=False,default=datetime.utcnow)
-
-
-    image_1 = db.Column(db.String(150), nullable=False, default='image1.jpg')
-    image_2 = db.Column(db.String(150), nullable=False, default='image2.jpg')
-    image_3 = db.Column(db.String(150), nullable=False, default='image3.jpg')
-    image_4 = db.Column(db.String(150), nullable=False, default='image4.jpg')
-    image_5 = db.Column(db.String(150), nullable=False, default='image5.jpg')
+    image_1 = db.Column(db.String(150), nullable=False, default='product-single-1.jpg')
+    image_2 = db.Column(db.String(150), nullable=False, default='product-single-2.jpg')
+    image_3 = db.Column(db.String(150), nullable=False, default='product-single-3.jpg')
+    image_4 = db.Column(db.String(150), nullable=False, default='product-single-4.jpg')
+    image_5 = db.Column(db.String(150), nullable=False, default='product-single-5.jpg')
 
     def __repr__(self):
         return '<Post %r>' % self.name
@@ -75,7 +73,7 @@ class Category(db.Model):
     name = db.Column(db.String(30), unique=True, nullable=False)
 
     def __repr__(self):
-        return '<Catgory %r>' % self.name
+        return '<Category %r>' % self.name
 
 
 db.create_all()
