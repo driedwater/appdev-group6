@@ -18,7 +18,7 @@
             <td>{{loop.index}}</td>
             <td>{{ product.name }}</td>
             <td> <img src="{{url_for('static',filename='product_pics/' + product.image_1)}}" alt="{{product.name}}" width="50" height="50"></td>
-            <td>{{ product.category_id}}</td>
+            <td>{{ product.category.name}}</td>
             <td>{{ product.price }}</td>
             <td>{{ product.stock }}</td>
             <td> <a href="{{url_for('update_product', id=product.id)}}" class="btn btn-sm btn-info">Edit </a> </td>
