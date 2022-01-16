@@ -1,5 +1,5 @@
 from flask_login.mixins import UserMixin
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, PasswordField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
@@ -11,7 +11,7 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 class RegistrationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
-    username =  StringField('Username', validators=[DataRequired(), Length(min=5, max=20)])
+    username =  StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = StringField('Password', validators=[DataRequired()])
     confirm_password = StringField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
@@ -60,9 +60,18 @@ class AddproductForm(FlaskForm):
     price = FloatField('Price', [validators.DataRequired()])
     stock = IntegerField('Stock', [validators.DataRequired()])
     image_1 = FileField('Image 1', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
-    image_2 = FileField('Image 2', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
-    image_3 = FileField('Image 3', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
-    image_4 = FileField('Image 4', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
-    image_5 = FileField('Image 5', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    image_2 = FileField('Image 2', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
+    image_3 = FileField('Image 3', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
+    image_4 = FileField('Image 4', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
+    image_5 = FileField('Image 5', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
     submit = SubmitField("Add product")
-    
+
+
+class AdminRegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    email  = StringField('Email',validators=[DataRequired(), Email()])
+    password = PasswordField('Password',validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+    first_name = StringField('First Name', validators=[DataRequired()])
+    last_name = StringField('Last Name', validators=[DataRequired()])

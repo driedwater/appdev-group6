@@ -64,6 +64,8 @@
                                                 <li class="shopping-cart"><a href="{{url_for('cart')}}" class="cart"><span><small>0</small><i class="icon-shopping-cart"></i></span></a></li>
                                             {% elif current_user.role == 'admin' %}
                                                 <li><a href="{{url_for('dashboard')}}">Dashboard</a></li>
+                                                <Li><a href="{{url_for('account')}}">Account</a></Li>
+                                                <li><a href="{{url_for('display_product')}}">Product List</a></li>
                                                 <Li><a href="{{url_for('logout')}}">Log Out</a></Li>
                                             {% endif %}
                                         {% else %}
