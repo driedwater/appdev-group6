@@ -5,7 +5,7 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
 from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm
-from ecommercesite.database import Staff, Users, User, Addproducts
+from ecommercesite.database import Staff, Users, User, Addproducts, Category
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 
@@ -170,15 +170,18 @@ def save_product_picture(form_pic):
 
     return picture_fn
 
+
 @app.route('/admin/add_product', methods=['POST', 'GET'])
 @login_required 
 #--@admin_required --#
 def add_product():
     form = AddproductForm()
+    categories = Category.query.all()
     if request.method=="POST" and 'image_1' in request.files:
         name = form.name.data
         description = form.description.data
         category = request.form.get('category')
+        
         price = form.price.data
         stock = form.stock.data
         image_1 = save_product_picture(request.files.get('image_1'))
@@ -191,4 +194,89 @@ def add_product():
         db.session.commit()
         flash(f'The product {name} has been added to database!','success')
         return redirect(url_for('add_product'))
-    return render_template('admin/add_product.html', form=form, title='Add a Product')
+    return render_template('admin/add_product.html', form=form, title='Add a Product', categories=categories)
+
+@app.route('/admin/display_product')
+@login_required
+#-- @admin_required --#
+def display_product():
+    products = Addproducts.query.all()
+    return render_template('admin/display_product.html', title='Product List', products=products)
+
+
+@app.route('/updateproduct/<int:id>', methods=['GET','POST'])
+def update_product(id):
+    form = AddproductForm(request.form)
+    product = Addproducts.query.get_or_404(id)
+    categories = Category.query.all()
+    category = request.form.get('category')
+    if request.method =="POST":
+        product.name = form.name.data 
+        product.description = form.description.data
+        product.price = form.price.data 
+        product.stock = form.stock.data
+        product.category_id = category
+        if request.files.get('image_1'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_1))
+                product.image_1 = save_product_picture(request.files.get('image_1'))
+            except:
+                product.image_1 = save_product_picture(request.files.get('image_1'))
+        if request.files.get('image_2'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_2))
+                product.image_2 = save_product_picture(request.files.get('image_2'))
+            except:
+                product.image_2 = save_product_picture(request.files.get('image_2'))
+        if request.files.get('image_3'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
+                product.image_3 = save_product_picture(request.files.get('image_3'))
+            except:
+                product.image_3 = save_product_picture(request.files.get('image_3'))
+        if request.files.get('image_4'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
+                product.image_4 = save_product_picture(request.files.get('image_4'))
+            except:
+                product.image_4 = save_product_picture(request.files.get('image_4'))
+        if request.files.get('image_5'):
+            try:
+                os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
+                product.image_5 = save_product_picture(request.files.get('image_5'))
+            except:
+                product.image_5 = save_product_picture(request.files.get('image_5'))
+
+        flash('The product has been updated!','success')
+        db.session.commit()
+        return redirect(url_for('display_product'))
+    form.name.data = product.name
+    form.description.data = product.description
+    form.price.data = product.price
+    form.stock.data = product.stock
+    category = product.category_id
+    return render_template('admin/add_product.html', form=form, title='Update Product',getproduct=product, categories=categories)
+
+@app.route('/deleteproduct/<int:id>', methods=['POST'])
+def delete_product(id):
+    product = Addproducts.query.get_or_404(id)
+    if request.method =="POST":
+        try:
+            os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_1))
+            os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_2))
+            os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
+            os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_4))
+            os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_5))
+        except Exception as e:
+            print(e)
+        db.session.delete(product)
+        db.session.commit()
+        flash(f'The product {product.name} has been deleted from the product list.','success')
+        return redirect(url_for('display_product'))
+    flash(f'Cannot delete the product.','success')
+    return redirect(url_for('display_product'))
+ 
+
+@app.route('/admin/register')
+def admin_register():
+     pass

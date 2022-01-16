@@ -14,5 +14,6 @@ staff = Staff(first_name='z', last_name='s', username='zs', email='zs@gmail.com'
 staff2 = Staff(first_name='ash', last_name='t', username='ashley', email='at@gmail.com', password=hash_password(pw2), role='admin')
 
 db.session.add(staff)
+db.session.commit()
 db.session.add(staff2)
 db.session.commit()
