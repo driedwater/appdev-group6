@@ -153,7 +153,7 @@ def checkout():
 
 @app.route('/admin/dashboard')
 @login_required
-#-- @admin_required --#
+@admin_required
 def dashboard():
     return render_template('/admin/dashboard.html', title='Dashboard')
 
@@ -173,7 +173,7 @@ def save_product_picture(form_pic):
 
 @app.route('/admin/add_product', methods=['POST', 'GET'])
 @login_required 
-#--@admin_required --#
+@admin_required
 def add_product():
     form = AddproductForm()
     categories = Category.query.all()
@@ -198,13 +198,15 @@ def add_product():
 
 @app.route('/admin/display_product')
 @login_required
-#-- @admin_required --#
+@admin_required
 def display_product():
     products = Addproducts.query.all()
     return render_template('admin/display_product.html', title='Product List', products=products)
 
 
 @app.route('/updateproduct/<int:id>', methods=['GET','POST'])
+@login_required
+@admin_required
 def update_product(id):
     form = AddproductForm(request.form)
     product = Addproducts.query.get_or_404(id)
@@ -258,6 +260,8 @@ def update_product(id):
     return render_template('admin/add_product.html', form=form, title='Update Product',getproduct=product, categories=categories)
 
 @app.route('/deleteproduct/<int:id>', methods=['POST'])
+@login_required
+@admin_required
 def delete_product(id):
     product = Addproducts.query.get_or_404(id)
     if request.method =="POST":
