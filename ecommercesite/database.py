@@ -1,4 +1,5 @@
 from ecommercesite import db, login_manager
+from itsdangerous import TimedSerializer as Serializer
 from flask_login import UserMixin
 from datetime import datetime
 
@@ -54,6 +55,7 @@ class Addproducts(db.Model):
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.Text, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'),nullable=False)
+    #category_name = db.Column(db.String(20), db.ForeignKey('category.name'), nullable=True)
     category = db.relationship('Category',backref=db.backref('categories', lazy=True))
     price = db.Column(db.Numeric(10,2), nullable=False)
     stock = db.Column(db.Integer, nullable=False)
@@ -64,6 +66,7 @@ class Addproducts(db.Model):
     image_4 = db.Column(db.String(150), nullable=False, default='product-single-4.jpg')
     image_5 = db.Column(db.String(150), nullable=False, default='product-single-5.jpg')
 
+
     def __repr__(self):
         return '<Post %r>' % self.name
     
@@ -71,6 +74,7 @@ class Addproducts(db.Model):
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=True, nullable=False)
+    
 
     def __repr__(self):
         return '<Category %r>' % self.name
