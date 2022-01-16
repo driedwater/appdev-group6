@@ -39,7 +39,7 @@ class Users(User):
 
 
 class Staff(User):
-    temporary = db.Column(db.Integer, nullable=True)
+    pass
 
     __mapper_args__ = {
         'polymorphic_identity':'staff'
