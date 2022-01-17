@@ -30,7 +30,7 @@
 					<div class="product-grid" style="background-image:url(images/product-1.jpg);">
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
@@ -41,28 +41,31 @@
 					</div>
 				</div>
 			</div>
+			{% for product in products %}
 			<div class="col-md-4 text-center animate-box">
 				<div class="product">
 					<div class="product-grid" style="background-image:url(images/product-2.jpg);">
+						<img src="{{url_for('static',filename='product_pics/' + product.image_1)}}" alt="{{product.name}}" width="50" height="50"></td>
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
 					</div>
 					<div class="desc">
-						<h3><a href="single.html">Pavilion Speaker</a></h3>
+						<h3><a href="single.html">{{ product.name}}</a></h3>
 						<span class="price">$600</span>
 					</div>
 				</div>
 			</div>
+			{% endfor %}
 			<div class="col-md-4 text-center animate-box">
 				<div class="product">
 					<div class="product-grid" style="background-image:url(images/product-3.jpg);">
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
@@ -80,7 +83,7 @@
 					<div class="product-grid" style="background-image:url(images/product-4.jpg);">
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
@@ -96,7 +99,7 @@
 					<div class="product-grid" style="background-image:url(images/product-5.jpg);">
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
@@ -112,7 +115,7 @@
 					<div class="product-grid" style="background-image:url(images/product-6.jpg);">
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
@@ -130,7 +133,7 @@
 					<div class="product-grid" style="background-image:url(images/product-7.jpg);">
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
@@ -146,7 +149,7 @@
 					<div class="product-grid" style="background-image:url(images/product-8.jpg);">
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
@@ -162,7 +165,7 @@
 					<div class="product-grid" style="background-image:url(images/product-9.jpg);">
 						<div class="inner">
 							<p>
-								<a href="single.html" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
 								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>

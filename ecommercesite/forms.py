@@ -75,3 +75,11 @@ class AdminRegisterForm(FlaskForm):
     submit = SubmitField('Sign Up')
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
+
+class AddToCartForm(FlaskForm):
+    name = StringField('Product Name', [validators.DataRequired()])
+    description = TextAreaField('Description', [validators.DataRequired()])
+    category = SelectField('Category', [validators.DataRequired()])
+    price = FloatField('Price', [validators.DataRequired()])
+    image_1 = FileField('Image 1', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    submit = SubmitField("Add product")
