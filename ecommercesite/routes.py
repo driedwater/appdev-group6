@@ -4,8 +4,8 @@ from unicodedata import category
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
-from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm
-from ecommercesite.database import Staff, Users, User, Addproducts, Category
+from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm, AdminRegisterForm
+from ecommercesite.database import Staff, Users, User, Addproducts, Category, Cart
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 
@@ -282,6 +282,16 @@ def delete_product(id):
     return redirect(url_for('display_product'))
  
 
-@app.route('/admin/register')
+@app.route('/admin/register', methods=['GET','POST'])
+@login_required
+@admin_required
 def admin_register():
-     pass
+    form = AdminRegisterForm()
+    if form.validate_on_submit():
+        hash_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = Staff(first_name=form.first_name.data, last_name=form.last_name.data, username=form.username.data, email=form.email.data, password=hash_pw, role='admin')
+        db.session.add(user)
+        db.session.commit()
+        flash(f'Account has been created, you can now login.', 'success')
+        return redirect(url_for('home'))
+    return render_template('admin/admin_register.html', form=form)

@@ -76,6 +76,19 @@ class AdminRegisterForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
 
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            user = Users.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError('Username is taken.')
+
+    def validate_email(self, email):
+        if email.data != current_user.email:
+            user = Users.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('email is taken.')
+
+
 class AddToCartForm(FlaskForm):
     name = StringField('Product Name', [validators.DataRequired()])
     description = TextAreaField('Description', [validators.DataRequired()])
