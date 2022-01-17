@@ -78,7 +78,8 @@ def home():
 
 @app.route('/shop')
 def shop():
-    return render_template('shop.html', title='Shop')
+    products = Addproducts.query.all()
+    return render_template('shop.html', title='Shop', products=products)
 
 @app.route('/about')
 def about():
