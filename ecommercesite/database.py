@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(60), nullable=False)
     role = db.Column(db.String(10), nullable=False, default='user')
+    image_file = db.Column(db.String(20), nullable=False, default='defaultpfp.jpg')
 
     __mapper_args__ = {
         'polymorphic_on':type,
@@ -28,7 +29,7 @@ class User(db.Model, UserMixin):
         return f"User( '{self.username}', '{self.email}')"
 
 class Users(User):
-    image_file = db.Column(db.String(20), nullable=False, default='defaultpfp.jpg')
+    pass
 
     __mapper_args__ = {
         'polymorphic_identity':'users'
@@ -55,7 +56,6 @@ class Addproducts(db.Model):
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.Text, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'),nullable=False)
-    #category_name = db.Column(db.String(20), db.ForeignKey('category.name'), nullable=True)
     category = db.relationship('Category',backref=db.backref('categories', lazy=True))
     price = db.Column(db.Numeric(10,2), nullable=False)
     stock = db.Column(db.Integer, nullable=False)
