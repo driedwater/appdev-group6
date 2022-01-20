@@ -28,8 +28,9 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User( '{self.username}', '{self.email}')"
 
+
 class Users(User):
-    pass
+    cart = db.relationship('Items_In_Cart', backref='cart_id', lazy=True)
 
     __mapper_args__ = {
         'polymorphic_identity':'users'
@@ -79,11 +80,11 @@ class Category(db.Model):
     def __repr__(self):
         return '<Category %r>' % self.name
 
-
-class Cart(db.Model):
+class Items_In_Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    product_image = db.Column(db)
     product_id = db.Column(db.Integer,  db.ForeignKey('addproducts.id'),nullable=True)
-    product = db.relationship('Addproducts', backref='product id', lazy=True)
+
 
 db.create_all()
 
