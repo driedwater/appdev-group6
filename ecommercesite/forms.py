@@ -75,3 +75,24 @@ class AdminRegisterForm(FlaskForm):
     submit = SubmitField('Sign Up')
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
+
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            user = Users.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError('Username is taken.')
+
+    def validate_email(self, email):
+        if email.data != current_user.email:
+            user = Users.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('email is taken.')
+
+
+class AddToCartForm(FlaskForm):
+    name = StringField('Product Name', [validators.DataRequired()])
+    description = TextAreaField('Description', [validators.DataRequired()])
+    category = SelectField('Category', [validators.DataRequired()])
+    price = FloatField('Price', [validators.DataRequired()])
+    image_1 = FileField('Image 1', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    submit = SubmitField("Add product")
