@@ -79,6 +79,8 @@ class Category(db.Model):
     def __repr__(self):
         return '<Category %r>' % self.name
 
+class cart(db.Model):   
+    pass
 
 db.create_all()
 
