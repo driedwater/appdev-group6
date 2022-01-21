@@ -163,7 +163,7 @@ def add_to_cart(id):
 @app.route('/cart')
 @login_required
 def cart():
-    cart_items = Users.query.all()
+    cart_items = Users.query.get_or_404(user)
     return render_template('cart.html', title='Shopping Cart', cart_items=cart_items)
 
 
