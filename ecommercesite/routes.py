@@ -157,12 +157,14 @@ def product_details(id):
 @app.route('/cart/add')
 def add_to_cart(id):
     products = Addproducts.query.get_or_404(id)
+    form = AddToCar
+    )
     return render_template('cart.html', title='Shopping Cart')
 
 
 @app.route('/cart')
 @login_required
-def cart():
+def cart(user):
     cart_items = Users.query.get_or_404(user)
     return render_template('cart.html', title='Shopping Cart', cart_items=cart_items)
 
