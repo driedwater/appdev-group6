@@ -4,6 +4,50 @@
     <p class='text-center'>{{ current_user.username }}'s Cart</p>
 </div>
 
+<div class="page-wrapper">
+  <div class="cart shopping">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <div class="block">
+            <div class="product-list">
+              <form method="post">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th class="">Item Name</th>
+                      <th class="">Item Price</th>
+                      <th class="">Quantity</th>
+                      <th class="">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{% for product in cart_items %}}
+                    <tr class="">
+                      <td class="">
+                        <div class="product-info">
+                          <img width="80" src="{{url_for('static', filename='product_pics/' + product.image_1)}}" alt="" />
+                          <a href="#!">Winter Themed Hanging Decoration</a>
+                        </div>
+                      </td>
+                      <td class="">$200.00</td>
+                      <td class="">2</td>
+                      <td class="">
+                        <a class="product-remove" href="#!">Remove</a>
+                      </td>
+                    </tr>
+
+                    {{% endfor %}}
+                  </tbody>
+                </table>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="container text-center">
   <p>

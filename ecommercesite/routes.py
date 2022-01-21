@@ -157,8 +157,9 @@ def product_details(id):
 @app.route('/cart/add')
 def add_to_cart(id):
     products = Addproducts.query.get_or_404(id)
-    form = AddToCar
-    )
+    form = AddToCart()
+    if form.validate_on_submit():
+        pass
     return render_template('cart.html', title='Shopping Cart')
 
 

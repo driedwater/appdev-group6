@@ -25,6 +25,24 @@
                                 <label for="name">Product Description</label>
                                 {{ form.description(class="form-control", rows="10") }}
                             </div>
+                            <div class="row">
+                            <div class="form-group mb-3 col-xs-12 col-sm-3">
+                              <label for="price">Length (cm)</label>
+                              {{ form.length(class="form-control") }}
+                            </div>
+    
+                            <div class="form-group mb-3 col-xs-12 col-sm-3">
+                              <label
+                                for="stock">Width (cm)</label>
+                                {{ form.width(class="form-control") }}
+                            </div>
+
+                            <div class="form-group mb-3 col-xs-12 col-sm-3">
+                              <label
+                                for="stock">Depth (cm)</label>
+                                {{ form.depth(class="form-control") }}
+                            </div>
+                          </div>
 
                             <div class="form-group mb-3">
                                 <label for="category">Category</label>
@@ -65,6 +83,8 @@
                             {{ form.image_4 }}  
                             {{ form.image_5 }}
                             </div>
+                
+                            
              
                 <p><input type="submit" value="{% if getproduct %}Update {% else %}Add{% endif %} product" class="btn btn-primary btn-block mx-auto">
                 </form>

@@ -32,8 +32,8 @@
 						<img src="{{url_for('static',filename='product_pics/' + product.image_1)}}" alt="{{product.name}}" width="359.99" height="350">
 						<div class="inner">
 							<p>
-								<a href="add_to_cart.html" class="icon"><i class="icon-shopping-cart"></i></a>
-								<a href="single.html" class="icon"><i class="icon-eye"></i></a>
+								<a href="{{ url_for('add_to_cart',id=product.id) }}" class="icon"><i class="icon-shopping-cart"></i></a>
+								<a href="{{ url_for('product_details',id=product.id) }}" class="icon"><i class="icon-eye"></i></a>
 							</p>
 						</div>
 					</div>
@@ -43,6 +43,9 @@
 					</div>
 				</div>
 			</div>
-			
+
 			{% endfor %}
+		</div>
+	</div>
+</div>
 {% endblock content %}

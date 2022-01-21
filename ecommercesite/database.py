@@ -30,7 +30,8 @@ class User(db.Model, UserMixin):
 
 
 class Users(User):
-    cart = db.relationship('Items_In_Cart', backref='cart_id', lazy=True)
+    cart = db.relationship('Items_In_Cart', backref='cart_user', lazy=True)
+    review = db.relationship('Review', backref='author', lazy=True)
 
     __mapper_args__ = {
         'polymorphic_identity':'users'
@@ -38,6 +39,22 @@ class Users(User):
 
     def __repr__(self):
         return f"User( '{self.username}', '{self.email}')"
+
+class Items_In_Cart(db.Model):
+    __tablename__ = 'items_in_cart'
+    id = db.Column(db.Integer, primary_key=True)
+    image_1 = db.Column(db.String(150), nullable=False, default='product-single-1.jpg')
+    name = db.Column(db.String(80), nullable=False)
+    price = db.Column(db.Numeric(10,2), nullable=False)
+    quantity = db.Column(db.Numeric(), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class Review(db.Model):
+    __tablename__ = 'review'
+    id = db.Column(db.Integer, primary_key=True)
+    user_review = db.Column(db.String(1000), nullable=False)
+    product_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
 class Staff(User):
@@ -56,6 +73,9 @@ class Addproducts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.Text, nullable=False)
+    length = db.Column(db.Integer, nullable=False)
+    width = db.Column(db.Integer, nullable=False)
+    depth = db.Column(db.Integer, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'),nullable=False)
     category = db.relationship('Category',backref=db.backref('categories', lazy=True))
     price = db.Column(db.Numeric(10,2), nullable=False)
@@ -79,11 +99,6 @@ class Category(db.Model):
 
     def __repr__(self):
         return '<Category %r>' % self.name
-
-class Items_In_Cart(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    product_image = db.Column(db)
-    product_id = db.Column(db.Integer,  db.ForeignKey('addproducts.id'),nullable=True)
 
 
 db.create_all()

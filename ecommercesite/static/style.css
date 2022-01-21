@@ -866,6 +866,9 @@ h1, h2, h3, h4, h5, h6, figure {
 }
 .product:hover .inner, .product:focus .inner {
   opacity: 1;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
 }
 .product:hover .desc h3 a, .product:focus .desc h3 a {
   color: #d1c286;
