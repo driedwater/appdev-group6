@@ -1,11 +1,12 @@
 from ast import Add
 import secrets, os
+from turtle import width
 from unicodedata import category
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
-from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm, AdminRegisterForm
-from ecommercesite.database import Staff, Users, User, Addproducts, Category, Cart
+from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm, AdminRegisterForm, AddReviewForm
+from ecommercesite.database import Staff, Users, User, Addproducts, Category, Items_In_Cart, Review
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 
@@ -139,11 +140,32 @@ def delete_account():
     db.session.commit()
     flash('Your account has been deleted.', 'success')
     return redirect(url_for('home'))
-    
+
+@app.route('/product_details/<int:id>', methods=['GET', 'POST'])
+def product_details(id):
+    products = Addproducts.query.get_or_404(id)
+    product_reviews = Review.query.filter_by(id=id)
+    form = AddReviewForm()
+    if form.validate_on_submit():
+        review = Review(user_review=form.review.data, product_id=id, author=current_user)
+        db.session.add(review)
+        db.session.commit()
+        flash('review has been added', 'success')
+        return redirect(url_for('home'))
+    return render_template('product_details.html', title="Product Details", products=products, product_reviews=product_reviews ,form=form)
+
+@app.route('/cart/add')
+def add_to_cart(id):
+    products = Addproducts.query.get_or_404(id)
+    return render_template('cart.html', title='Shopping Cart')
+
+
 @app.route('/cart')
 @login_required
 def cart():
-    return render_template('cart.html', title='Shopping Cart')
+    cart_items = Users.query.all()
+    return render_template('cart.html', title='Shopping Cart', cart_items=cart_items)
+
 
 @app.route('/checkout')
 @login_required
@@ -168,7 +190,6 @@ def save_product_picture(form_pic):
     i = Image.open(form_pic)
     i.thumbnail(output_size)
     i.save(picture_path)
-
     return picture_fn
 
 
@@ -181,8 +202,10 @@ def add_product():
     if request.method=="POST" and 'image_1' in request.files:
         name = form.name.data
         description = form.description.data
+        length = form.length.data
+        width = form.width.data
+        depth = form.depth.data
         category = request.form.get('category')
-        
         price = form.price.data
         stock = form.stock.data
         image_1 = save_product_picture(request.files.get('image_1'))
@@ -190,7 +213,7 @@ def add_product():
         image_3 = save_product_picture(request.files.get('image_3'))
         image_4 = save_product_picture(request.files.get('image_4'))
         image_5 = save_product_picture(request.files.get('image_5'))
-        add_product = Addproducts(name = name, description = description, category_id = category, price = price, stock = stock, image_1 = image_1, image_2 = image_2, image_3 = image_3, image_4 = image_4, image_5 = image_5)
+        add_product = Addproducts(name = name, description = description, length = length, width = width, depth = depth, category_id = category, price = price, stock = stock, image_1 = image_1, image_2 = image_2, image_3 = image_3, image_4 = image_4, image_5 = image_5)
         db.session.add(add_product)
         db.session.commit()
         flash(f'The product {name} has been added to database!','success')
@@ -216,6 +239,9 @@ def update_product(id):
     if request.method =="POST":
         product.name = form.name.data 
         product.description = form.description.data
+        product.length = form.length.data
+        product.width = form.width.data
+        product.depth = form.depth.data
         product.price = form.price.data 
         product.stock = form.stock.data
         product.category_id = category
@@ -255,6 +281,9 @@ def update_product(id):
         return redirect(url_for('display_product'))
     form.name.data = product.name
     form.description.data = product.description
+    form.length.data = product.length
+    form.width.data = product.width
+    form.depth.data = product.depth
     form.price.data = product.price
     form.stock.data = product.stock
     category = product.category_id
@@ -282,9 +311,9 @@ def delete_product(id):
     return redirect(url_for('display_product'))
  
 
-@app.route('/admin/register', methods=['GET','POST'])
-@login_required
-@admin_required
+@app.route('/admin/admin_register', methods=['GET','POST'])
+#@login_required
+#@admin_required
 def admin_register():
     form = AdminRegisterForm()
     if form.validate_on_submit():
@@ -295,3 +324,8 @@ def admin_register():
         flash(f'Account has been created, you can now login.', 'success')
         return redirect(url_for('home'))
     return render_template('admin/admin_register.html', form=form)
+
+@app.route('/admin/customer_database')
+def customer_database():
+    users = Users.query.all()
+    return render_template('admin/customer_database.html', users=users)
