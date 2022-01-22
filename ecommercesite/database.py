@@ -46,7 +46,7 @@ class Items_In_Cart(db.Model):
     image_1 = db.Column(db.String(150), nullable=False, default='product-single-1.jpg')
     name = db.Column(db.String(80), nullable=False)
     price = db.Column(db.Numeric(10,2), nullable=False)
-    quantity = db.Column(db.Numeric(), nullable=False)
+    quantity = db.Column(db.Numeric(), nullable=False, default='1')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Review(db.Model):

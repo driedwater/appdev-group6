@@ -147,7 +147,7 @@ def delete_account():
 @app.route('/product_details/<int:id>', methods=['GET', 'POST'])
 def product_details(id):
     products = Addproducts.query.get_or_404(id)
-    product_reviews = Review.query.filter_by(id=id)
+    product_reviews = Review.query.filter_by(product_id=id)
     form = AddReviewForm()
     if form.validate_on_submit():
         review = Review(user_review=form.review.data, product_id=id, author=current_user)
@@ -157,20 +157,22 @@ def product_details(id):
         return redirect(url_for('home'))
     return render_template('product_details.html', title="Product Details", products=products, product_reviews=product_reviews ,form=form)
 
-@app.route('/cart/add')
+@app.route('/addcart/<int:id>', methods=['GET', 'POST'])
+@login_required
 def add_to_cart(id):
     products = Addproducts.query.get_or_404(id)
-    form = AddToCart()
-    if form.validate_on_submit():
-        pass
-    return render_template('cart.html', title='Shopping Cart')
+    cart = Items_In_Cart(image_1=products.image_1, name=products.name, price=products.price, user_id=current_user.id)
+    db.session.add(cart)
+    db.session.commit()
+    flash('Item has been added to cart!', 'success')
+    return redirect(url_for('shop'))
 
 
-@app.route('/cart')
+@app.route('/cart/<int:user>', methods=['GET', 'POST'])
 @login_required
 def cart(user):
-    cart_items = Users.query.get_or_404(user)
-    return render_template('cart.html', title='Shopping Cart', cart_items=cart_items)
+    cart_items = Items_In_Cart.query.filter_by(user_id=user).all()
+    return render_template('cart.html', title='Shopping Cart', current_user=current_user, cart_items=cart_items)
 
 
 @app.route('/checkout')

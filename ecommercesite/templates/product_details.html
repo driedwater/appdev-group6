@@ -46,7 +46,7 @@
                     <div class="col-md-8 col-md-offset-2 text-center fh5co-heading">
                         <h2>{{ products.name }}</h2>
                         <p>
-                            <a href="{{ url_for('cart')}}" class="btn btn-primary btn-outline btn-lg">Add to Cart</a>
+                            <a href="{{ url_for('add_to_cart', id=products.id)}}" class="btn btn-primary btn-outline btn-lg">Add to Cart</a>
                         </p>
                     </div>
                 </div>
@@ -92,15 +92,19 @@
                         </div>
 
                         <div class="fh5co-tab-content tab-content" data-tab-content="3">
-                            <div class="col-md-10 col-md-offset-1">
-                                <h3>Happy Buyers</h3>
+                            <div class="col-md-12">
+                                <h3>Reviews</h3>
                                 <div class="feed">
                                     {% for review in product_reviews %}
-                                    <div>
-                                        <blockquote>
+                                    <div class='container'>
+                                    <div class='row'>
+                                        <div class='col-md-1 image pull-left'>
+                                            <img src="{{url_for('static',filename='profile_pics/' + review.author.image_file)}}" alt="{{review.author.username}}" class="img responsive img-rounded" style="border: 1px solid black;" width="5" height="60">
+                                        </div>
+                                        <blockquote class='col-md-offset-1'>
                                             <p>{{ review.user_review }}</p>
                                         </blockquote>
-                                        <h3>&mdash; {{ review.author.username }}</h3>
+                                        <h3 class='col-md-offset-1'>&mdash; {{ review.author.username }}</h3>
                                         <span class="rate">
                                             <i class="icon-star2"></i>
                                             <i class="icon-star2"></i>
@@ -108,6 +112,7 @@
                                             <i class="icon-star2"></i>
                                             <i class="icon-star2"></i>
                                         </span>
+                                    </div>
                                     </div>
                                     {% endfor %}
                                     <div>

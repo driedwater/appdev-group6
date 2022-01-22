@@ -22,22 +22,22 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {{% for product in cart_items %}}
+                    {% for product in cart_items %}
                     <tr class="">
                       <td class="">
                         <div class="product-info">
                           <img width="80" src="{{url_for('static', filename='product_pics/' + product.image_1)}}" alt="" />
-                          <a href="#!">Winter Themed Hanging Decoration</a>
+                          <a href="#!">{{ product.name }}</a>
                         </div>
                       </td>
-                      <td class="">$200.00</td>
-                      <td class="">2</td>
+                      <td class="">{{ product.price }}</td>
+                      <td class="">{{ product.quantity }}</td>
                       <td class="">
                         <a class="product-remove" href="#!">Remove</a>
                       </td>
                     </tr>
 
-                    {{% endfor %}}
+                    {% endfor %}
                   </tbody>
                 </table>
               </form>
