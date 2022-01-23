@@ -1,12 +1,14 @@
 from ast import Add
+from email.headerregistry import Address
 import secrets, os
-from turtle import width
+from tabnanny import check
+from turtle import title, width
 from unicodedata import category
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
-from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm, AdminRegisterForm, AddReviewForm
-from ecommercesite.database import Staff, Users, User, Addproducts, Category, Items_In_Cart, Review
+from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm, AdminRegisterForm, AddReviewForm, CheckOutForm
+from ecommercesite.database import Staff, Users, User, Addproducts, Category, Items_In_Cart, Review, Customer_Payments
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 
@@ -152,8 +154,8 @@ def product_details(id):
         review = Review(user_review=form.review.data, product_id=id, author=current_user)
         db.session.add(review)
         db.session.commit()
-        flash('review has been added', 'success')
-        return redirect(url_for('home'))
+        flash('Your review has been added!', 'success')
+        return redirect(url_for('shop'))
     return render_template('product_details.html', title="Product Details", products=products, product_reviews=product_reviews ,form=form)
 
 @app.route('/addcart/<int:id>', methods=['GET', 'POST'])
@@ -166,18 +168,45 @@ def add_to_cart(id):
     flash('Item has been added to cart!', 'success')
     return redirect(url_for('shop'))
 
-
-@app.route('/cart/<int:user>', methods=['GET', 'POST'])
+@app.route('/deletecart/<int:id>', methods=['GET', 'POST'])
 @login_required
-def cart(user):
-    cart_items = Items_In_Cart.query.filter_by(user_id=user).all()
+def delete_cart(id):
+    cart_item = Items_In_Cart.query.filter_by(id=id).first()
+    db.session.delete(cart_item)
+    db.session.commit()
+    flash('Item has been deleted.', 'success')
+    return redirect(url_for('cart'))
+
+
+@app.route('/cart', methods=['GET', 'POST'])
+@login_required
+def cart():
+    cart_items = Items_In_Cart.query.filter_by(user_id=current_user.id).all()
     return render_template('cart.html', title='Shopping Cart', current_user=current_user, cart_items=cart_items)
 
 
-@app.route('/checkout')
+@app.route('/checkout', methods=['POST', 'GET'])
 @login_required
-def checkout():
-    return render_template('checkout.html', title='Checkout')
+def checkout_details():
+    form = CheckOutForm()
+    cart_items = Items_In_Cart.query.filter_by(user_id=current_user.id).all()
+    if request.method=="POST":
+        full_name = form.full_name.data
+        address = form.address.data
+        postal_code = form.postal_code.data
+        checkout_details = Customer_Payments(full_name=full_name, address=address, postal_code=postal_code)
+        db.session.add(checkout_details)
+        db.session.commit()
+        flash(f'Your order has been submitted!','success')
+        return redirect(url_for('thanks'))
+    return render_template('checkout.html', title='Checkout',form=form, cart_items=cart_items)
+
+
+@app.route('/thanks')
+def thanks():
+    return render_template('thanks.html', title='Order Confirmed')
+
+
 
 #---------------------ADMIN-PAGE------------------------#
 
@@ -336,3 +365,5 @@ def admin_register():
 def customer_database():
     users = Users.query.all()
     return render_template('admin/customer_database.html', users=users)
+
+

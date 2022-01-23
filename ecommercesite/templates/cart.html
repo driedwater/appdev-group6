@@ -33,7 +33,7 @@
                       <td class="">{{ product.price }}</td>
                       <td class="">{{ product.quantity }}</td>
                       <td class="">
-                        <a class="product-remove" href="#!">Remove</a>
+                        <a class="product-remove" href="{{ url_for('delete_cart', id=product.id)}}">Remove</a>
                       </td>
                     </tr>
 
@@ -51,7 +51,7 @@
 
 <div class="container text-center">
   <p>
-    <a class="btn btn-primary" href="{{ url_for('checkout')}}">Checkout</a>
+    <a class="btn btn-primary" href="{{ url_for('checkout_details')}}">Checkout</a>
   </p>
 </div>
 

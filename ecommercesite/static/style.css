@@ -10,6 +10,7 @@
 * 	Template Style 
 *
 * ======================================================= */
+
 body {
   font-family: "Playfair Display", serif;
   font-weight: 400;
@@ -1725,3 +1726,11 @@ h1, h2, h3, h4, h5, h6, figure {
   margin-bottom:30px;
 }
 /*# sourceMappingURL=style.css.map */
+
+#confirm {
+  position: absolute;
+  top: 45%;
+  bottom: 55%;
+  text-align: center;
+  right:440px;
+}
