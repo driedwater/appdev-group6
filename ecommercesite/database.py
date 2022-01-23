@@ -40,6 +40,16 @@ class Users(User):
     def __repr__(self):
         return f"User( '{self.username}', '{self.email}')"
 
+class Staff(User):
+    pass
+
+    __mapper_args__ = {
+        'polymorphic_identity':'staff'
+    }
+
+    def __repr__(self):
+        return f"User('{self.username}', '{self.email}')"
+
 class Items_In_Cart(db.Model):
     __tablename__ = 'items_in_cart'
     id = db.Column(db.Integer, primary_key=True)
@@ -55,17 +65,7 @@ class Review(db.Model):
     user_review = db.Column(db.String(1000), nullable=False)
     product_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
-
-class Staff(User):
-    pass
-
-    __mapper_args__ = {
-        'polymorphic_identity':'staff'
-    }
-
-    def __repr__(self):
-        return f"User('{self.username}', '{self.email}')"
+    rating = db.Column(db.Integer, nullable=False)
 
 
 class Addproducts(db.Model):
