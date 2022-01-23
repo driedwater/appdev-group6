@@ -20,8 +20,14 @@ body {
   background: #fff;
 }
 
-#address {
+#shop_address {
   color: #d1c286;
+}
+
+.summary_prices{
+    list-style: none;
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 #page {
@@ -1733,4 +1739,8 @@ h1, h2, h3, h4, h5, h6, figure {
   bottom: 55%;
   text-align: center;
   right:440px;
+}
+
+#user_address {
+  color: #000;
 }

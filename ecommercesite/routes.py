@@ -190,7 +190,7 @@ def cart():
 def checkout_details():
     form = CheckOutForm()
     cart_items = Items_In_Cart.query.filter_by(user_id=current_user.id).all()
-    if request.method=="POST":
+    if form.validate_on_submit():
         full_name = form.full_name.data
         address = form.address.data
         postal_code = form.postal_code.data
