@@ -4,7 +4,7 @@
 <div class="container tm-mt-big tm-mb-big">
     <div class="row">
           <div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto">
-            <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" id="add_productform">
               <div class="row">
                 <div class="col-12">
                   <h2 class="tm-block-title d-inline-block">Add Product</h2>
@@ -26,18 +26,18 @@
                                 {{ form.description(class="form-control", rows="10") }}
                             </div>
                             <div class="row">
-                            <div class="form-group mb-3 col-xs-12 col-sm-3">
+                            <div class="form-group mb-3  col-sm-4">
                               <label for="price">Length (cm)</label>
                               {{ form.length(class="form-control") }}
                             </div>
     
-                            <div class="form-group mb-3 col-xs-12 col-sm-3">
+                            <div class="form-group mb-3 col-sm-4">
                               <label
                                 for="stock">Width (cm)</label>
                                 {{ form.width(class="form-control") }}
                             </div>
 
-                            <div class="form-group mb-3 col-xs-12 col-sm-3">
+                            <div class="form-group mb-3 col-sm-4">
                               <label
                                 for="stock">Depth (cm)</label>
                                 {{ form.depth(class="form-control") }}

@@ -1,3 +1,6 @@
+
+
+
 {% extends 'layout.html' %}
 {% block content %}
 <div>
@@ -80,6 +83,8 @@
                         <div class="media-body">
                            <h4 class="media-heading">{{ product.name }}</h4>
                            <p class="price">{{ product.quantity }} x ${{ product.price }}</p>
+                           <span class="remove"><a href="{{ url_for('delete_cart_item_checkout', id=product.id)}}">Remove</a></span>
+                           <hr>
                         </div>
                         {% endfor %}
                      </div>

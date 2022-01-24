@@ -98,7 +98,7 @@ class AddToCartForm(FlaskForm):
 
 class AddReviewForm(FlaskForm):
     review = TextAreaField('Review', validators=[DataRequired(), Length(min=10, max=1000)])
-    rating = SelectField('Product Rating', )
+    rating = SelectField('Product Rating', choices=[(1, '1 Star'), (2, '2 Star'), (3, '3 Star'), (4, '4 Star'), (5, '5 Star')])
     submit = SubmitField('Submit')
 
 class CheckOutForm(FlaskForm):
