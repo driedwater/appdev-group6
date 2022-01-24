@@ -2,17 +2,32 @@
 
 {% block content %}
 
-<h2 class='text-center'>Welcome back, {{ current_user.username }}.</h2>
-<div class="row">
-    <div class='text-center'>
-    <a href="{{url_for('admin_register')}}">Admin Register</a>
-    </div>
-    <div class='text-center'>
-    <a href="{{url_for('add_product')}}">Add Product</a>
-    </div>
-    <div class='text-center'>
-    <a href="{{url_for('display_product')}}">Product List</a>
-    </div>
-</div>
+<div class="container">
 
+<h2 class='text-center'>Welcome back, {{ current_user.username }}.</h2>
+<u><h2 class='text-center'>Dashboard</h2><u>
+<hr>
+
+<form>
+    <fieldset style='border: 1px solid rgb(22, 0, 0);'>
+    <div class="row">
+        <div class="col-sm-3 col-md-offset-1">
+        <a class="btn btn-primary" href="{{url_for('admin_register')}}" role="button">Admin Register</a>    
+        </div>
+        <div class="col-sm-3 col-md-offset-1">
+        <a class="btn btn-primary" href="{{url_for('add_product')}}" role="button">Add Product</a>
+        </div>
+        <div class="col-sm-3 col-md-offset-1">
+        <a class="btn btn-primary" href="{{url_for('display_product')}}" role="button">Product List</a>
+        </div>
+        <div class="col-sm-3 col-md-offset-1">
+            <a class="btn btn-primary" href="{{url_for('customer_database')}}" role="button">Customer<br> Database</a>
+        </div>
+    </div>
+</fieldset>
+</form>
+
+
+</div>
+</div>
 {% endblock content %}

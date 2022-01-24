@@ -106,11 +106,9 @@
                                         </blockquote>
                                         <h3 class='col-md-offset-1'>&mdash; {{ review.author.username }}</h3>
                                         <span class="rate">
+                                            {% for star in range(review.rating) %}
                                             <i class="icon-star2"></i>
-                                            <i class="icon-star2"></i>
-                                            <i class="icon-star2"></i>
-                                            <i class="icon-star2"></i>
-                                            <i class="icon-star2"></i>
+                                            {% endfor %}
                                         </span>
                                     </div>
                                     </div>
@@ -135,6 +133,11 @@
                                                     {% endif %}
                                                 </div>
                                             </fieldset>
+                                            <div>
+                                                {{ form.rating.label(class="form-control-label") }}
+                                                {{form.rating(class='form-control')}}
+                                            </div>
+                                            <hr>
                                             <div class="form-group">
                                                 {{ form.submit(class="btn btn-outline-info") }}
                                             </div>

@@ -20,8 +20,14 @@ body {
   background: #fff;
 }
 
-#address {
+#shop_address {
   color: #d1c286;
+}
+
+.summary_prices{
+    list-style: none;
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 #page {
@@ -1714,6 +1720,7 @@ h1, h2, h3, h4, h5, h6, figure {
   min-height: 580px;
   height: 100%;
   max-height: 2000px;
+  min-width: 800px;
 }
 
 *, ::after, ::before {
@@ -1733,4 +1740,26 @@ h1, h2, h3, h4, h5, h6, figure {
   bottom: 55%;
   text-align: center;
   right:440px;
+}
+
+#user_address {
+  color: #000;
+}
+
+.search_function {
+  text-align: right;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  left: 1000px;
+  top: 700px; 
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+input {
+  margin: 0 0.5rem 0 0.5rem;
 }

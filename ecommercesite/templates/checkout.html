@@ -1,3 +1,6 @@
+
+
+
 {% extends 'layout.html' %}
 {% block content %}
 <div>
@@ -11,45 +14,56 @@
             <div class="col-md-8">
                <div class="block billing-details">
                   <h4 class="widget-title">Billing Details</h4>
-                  <form method="post" enctype="multipart/form-data">
-                     <div class="form-group">
-                        <form action=""  class="checkout-form">
-                        <label for="full_name">Full Name<span class="required">*</span></label>
-                        {{form.full_name(class="form-control")}}
-                     </div>
-                     <div class="form-group">
-                        <label for="address">Address<span class="required">*</span></label>
-                        {{form.address(class="form-control")}}
-                     </div>
-                        <div class="form-group">
-                           <label for="postal_code">Postal Code<span class="required">*</span></label>
-                           {{form.postal_code(class="form-control")}}
-                        </div>
-                  </form>
+                  <hr>
+                  <form method="POST" enctype="multipart/form-data">
+                     {{ form.hidden_tag() }}
+                  <div class="form-group">
+                     <label for="full_name">Full Name<span class="required">*</span></label>
+                     {% if form.full_name.errors %}
+                     {{ form.full_name(class="form-control form-control-lg is-invalid") }}
+                     <div class="invalid-feedback">
+                        {% for error in form.full_name.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                  </div>
+                  {% else %}
+                     {{ form.full_name(class="form-control form-control-lg") }}
+                  {% endif %}
+                  </div>
+                  <div class="form-group">
+                     <label for="user_address">Address<span class="required">*</span></label>
+                     {{form.address(class="form-control")}}
+                  </div>
+                  <div class="form-group">
+                     <label for="postal_code">Postal Code<span class="required">*</span></label>
+                     {{form.postal_code(class="form-control")}}
+                  </div>
                </div>
                <br><br>
                <div class="block">
                   <h4 class="widget-title">Payment Details</h4>
+                  <hr>
                   <div class="checkout-product-details">
                      <div class="payment">
                         <div class="card-details">
-                           <form  class="checkout-form">
-                              <div class="form-group">
-                                 <label for="card-number">Card Number <span class="required">*</span></label>
-                                 {{form.card_number(class="form-control")}} 
-                              </div>
+                           <div class="form-group">
+                              <label for="card-number">Card Number <span class="required">*</span></label>
+                              {{form.card_number(class="form-control")}} 
+                           </div>
 
-                              <div class="row">
-                                <div class="form-group mb-3 col-xs-12 col-sm-6">
-                                 <label for="card-expiry">Expiry (MM/YY) <span class="required">*</span></label>
-                                 {{form.expiry(class="form-control")}}
+                           <div class="row">
+                              <div class="form-group mb-3 col-xs-12 col-sm-6">
+                              <label for="card-expiry">Expiry (MM/YY) <span class="required">*</span></label>
+                              {{form.expiry(class="form-control")}}
+                           </div>
+                           <div class="form-group mb-3 col-xs-12 col-sm-6">
+                              <label for="card-cvc">CVV<span class="required">*</span></label>
+                              {{form.cvv(class="form-control")}}
+                           </div>
+                        </div>
+                              <div>
+                                 {{form.submit(class='btn btn-primary')}} 
                               </div>
-                             <div class="form-group mb-3 col-xs-12 col-sm-6">
-                                 <label for="card-cvc">CVV<span class="required">*</span></label>
-                                 {{form.cvv(class="form-control")}}
-                              </div>
-                              </div>
-                              <a href="{{url_for('thanks')}}" class="btn btn-primary">Place Order</a >
                            </form>
                         </div>
                      </div>
@@ -60,6 +74,7 @@
                <div class="product-checkout-details">
                   <div class="block">
                      <h4 class="widget-title">Order Summary</h4>
+                     <hr>
                      <div class="media product-card">
                         {% for product in cart_items %}
                         <a class="pull-left" href="product-single.html">
@@ -68,28 +83,32 @@
                         <div class="media-body">
                            <h4 class="media-heading">{{ product.name }}</h4>
                            <p class="price">{{ product.quantity }} x ${{ product.price }}</p>
+                           <span class="remove"><a href="{{ url_for('delete_cart_item_checkout', id=product.id)}}">Remove</a></span>
+                           <hr>
                         </div>
                         {% endfor %}
                      </div>
                      <div class="discount-code">
-                        <p>Have a discount ? <a data-toggle="modal" data-target="#coupon-modal" href="#!">enter it here</a></p>
+                        <p>Have a discount ? <a data-toggle="modal" data-target="#coupon-modal" href="#!">Enter it here</a></p>
                      </div>
-                     <ul class="summary-prices">
+                     <hr>
+                     <ul class="summary_prices">
                         <li>
                            <span>Subtotal:</span>
-                           <span class="price">$190</span>
+                           <span class="price"></span>
                         </li>
                         <li>
                            <span>Shipping:</span>
                            <span>Free</span>
                         </li>
                      </ul>
+                     <hr>
                      <div class="summary-total">
                         <span>Total</span>
                         <span>$250</span>
                      </div>
                      <div class="verified-icon">
-                        <img src="images/shop/verified.png">
+                        <img src="/static/images/verified.png" width="330" height="38">
                      </div>
                   </div>
                </div>

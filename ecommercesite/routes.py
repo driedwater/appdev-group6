@@ -151,12 +151,13 @@ def product_details(id):
     product_reviews = Review.query.filter_by(product_id=id)
     form = AddReviewForm()
     if form.validate_on_submit():
-        review = Review(user_review=form.review.data, product_id=id, author=current_user)
+        review = Review(user_review=form.review.data, product_id=id, author=current_user, rating=form.rating.data)
         db.session.add(review)
         db.session.commit()
         flash('Your review has been added!', 'success')
         return redirect(url_for('shop'))
     return render_template('product_details.html', title="Product Details", products=products, product_reviews=product_reviews ,form=form)
+
 
 @app.route('/addcart/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -184,18 +185,28 @@ def cart():
     cart_items = Items_In_Cart.query.filter_by(user_id=current_user.id).all()
     return render_template('cart.html', title='Shopping Cart', current_user=current_user, cart_items=cart_items)
 
+@app.route('/deletecartcheckout/<int:id>', methods=['GET', 'POST'])
+@login_required
+def delete_cart_item_checkout(id):
+    cart_item = Items_In_Cart.query.filter_by(id=id).first()
+    db.session.delete(cart_item)
+    db.session.commit()
+    flash('Item has been deleted.', 'success')
+    return redirect(url_for('checkout_details'))
 
 @app.route('/checkout', methods=['POST', 'GET'])
 @login_required
 def checkout_details():
     form = CheckOutForm()
     cart_items = Items_In_Cart.query.filter_by(user_id=current_user.id).all()
-    if request.method=="POST":
+    if form.validate_on_submit():
         full_name = form.full_name.data
         address = form.address.data
         postal_code = form.postal_code.data
         checkout_details = Customer_Payments(full_name=full_name, address=address, postal_code=postal_code)
         db.session.add(checkout_details)
+        for cart_item in cart_items:
+            db.session.delete(cart_item)
         db.session.commit()
         flash(f'Your order has been submitted!','success')
         return redirect(url_for('thanks'))
@@ -367,3 +378,8 @@ def customer_database():
     return render_template('admin/customer_database.html', users=users)
 
 
+
+#dummy just to let cher see#
+@app.route('/oceanus')
+def oceanus():
+    return render_template('oceanus.html', title = "Product Details")

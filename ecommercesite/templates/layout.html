@@ -61,7 +61,7 @@
                                             {% if current_user.role == 'user' %}
                                                 <Li><a href="{{url_for('account')}}">Account</a></Li>
                                                 <Li><a href="{{url_for('logout')}}">Log Out</a></Li>
-                                                <li class="shopping-cart"><a href="{{url_for('cart', user=current_user.id)}}" class="cart"><span><small>0</small><i class="icon-shopping-cart"></i></span></a></li>
+                                                <li class="shopping-cart"><a href="{{url_for('cart')}}" class="cart"><span><small>0</small><i class="icon-shopping-cart"></i></span></a></li>
                                             {% elif current_user.role == 'admin' %}
                                                 <li><a href="{{url_for('dashboard')}}">Dashboard</a></li>
                                                 <Li><a href="{{url_for('logout')}}">Log Out</a></Li>
