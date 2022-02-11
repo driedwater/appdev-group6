@@ -8,7 +8,7 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
 from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm, AdminRegisterForm, AddReviewForm, CheckOutForm
-from ecommercesite.database import Staff, Users, User, Addproducts, Category, Items_In_Cart, Review, Customer_Payments
+from ecommercesite.database import Staff, Users, User, Addproducts, Category, Items_In_Cart, Review, Customer_Payments, Product_Bought
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
 
@@ -163,7 +163,7 @@ def product_details(id):
 @login_required
 def add_to_cart(id):
     products = Addproducts.query.get_or_404(id)
-    cart = Items_In_Cart(image_1=products.image_1, name=products.name, price=products.price, user_id=current_user.id)
+    cart = Items_In_Cart(image_1=products.image_1, name=products.name, price=products.price, user_id=current_user.id, product_id=products.id)
     db.session.add(cart)
     db.session.commit()
     flash('Item has been added to cart!', 'success')
@@ -206,8 +206,12 @@ def checkout_details():
         checkout_details = Customer_Payments(full_name=full_name, address=address, postal_code=postal_code)
         db.session.add(checkout_details)
         for cart_item in cart_items:
+            product = Addproducts.query.filter_by(id=cart_item.product_id).first()
+            product.stock = product.stock - cart_item.quantity
+            product_bought = Product_Bought(quantity=cart_item.quantity, product_id=cart_item.product_id, user_id=cart_item.user_id)
+            db.session.add(product_bought)
             db.session.delete(cart_item)
-        db.session.commit()
+            db.session.commit()
         flash(f'Your order has been submitted!','success')
         return redirect(url_for('thanks'))
     return render_template('checkout.html', title='Checkout',form=form, cart_items=cart_items)

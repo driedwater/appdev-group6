@@ -32,7 +32,7 @@ class User(db.Model, UserMixin):
 class Users(User):
     cart = db.relationship('Items_In_Cart', backref='cart_user', lazy=True)
     review = db.relationship('Review', backref='author', lazy=True)
-    prod_bought = db.relationship('Product_Bought', backref='product_id_bought', lazy=True)
+    product_bought = db.relationship('Product_Bought', backref='product_id_bought', lazy=True)
 
     __mapper_args__ = {
         'polymorphic_identity':'users'
@@ -51,15 +51,15 @@ class Staff(User):
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
-'''
-class Product_Bought():
+
+class Product_Bought(db.Model):
     __tablename__ = 'product_bought'
     id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)
     date_bought = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     product_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-'''
+
 
 class Items_In_Cart(db.Model):
     __tablename__ = 'items_in_cart'
@@ -68,7 +68,9 @@ class Items_In_Cart(db.Model):
     name = db.Column(db.String(80), nullable=False)
     price = db.Column(db.Numeric(10,2), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default='1')
+    product_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
 
 class Review(db.Model):
     __tablename__ = 'review'
