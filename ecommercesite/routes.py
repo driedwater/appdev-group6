@@ -98,7 +98,7 @@ def services():
 def contacts():
     return render_template('contacts.html', title='Contacts')
 
-def save_picture(form_pic):
+def save_picture(form_pic, current_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_pic.filename)
     picture_fn = random_hex + f_ext
@@ -109,6 +109,10 @@ def save_picture(form_pic):
     i.thumbnail(output_size)
     i.save(picture_path)
 
+    if current_picture != "defaultpfp.jpg":
+        os.remove(os.path.join(app.root_path, "static/profile_pics/", current_picture))
+
+
     return picture_fn
 
 @app.route('/account', methods=['GET', 'POST'])
@@ -117,7 +121,7 @@ def account():
     form = UpdateUserAccountForm()
     if form.validate_on_submit():
         if form.picture.data:
-            picture_file = save_picture(form.picture.data)
+            picture_file = save_picture(form.picture.data, current_user.image_file)
             current_user.image_file = picture_file
         current_user.first_name = form.first_name.data
         current_user.last_name = form.last_name.data
