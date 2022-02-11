@@ -149,6 +149,10 @@ def delete_account():
 def product_details(id):
     products = Addproducts.query.get_or_404(id)
     product_reviews = Review.query.filter_by(product_id=id)
+    if current_user.is_authenticated:
+        product_bought = Product_Bought.query.filter_by(user_id=current_user.id, product_id=id).first()
+    else:
+        product_bought = None
     form = AddReviewForm()
     if form.validate_on_submit():
         review = Review(user_review=form.review.data, product_id=id, author=current_user, rating=form.rating.data)
@@ -156,7 +160,7 @@ def product_details(id):
         db.session.commit()
         flash('Your review has been added!', 'success')
         return redirect(url_for('shop'))
-    return render_template('product_details.html', title="Product Details", products=products, product_reviews=product_reviews ,form=form)
+    return render_template('product_details.html', title="Product Details", products=products, product_reviews=product_reviews ,form=form, product_bought=product_bought)
 
 
 @app.route('/addcart/<int:id>', methods=['GET', 'POST'])
