@@ -1,9 +1,6 @@
 from ast import Add
 from email.headerregistry import Address
 import secrets, os
-from tabnanny import check
-from turtle import title, width
-from unicodedata import category
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
 from ecommercesite import app, bcrypt, db
@@ -11,7 +8,15 @@ from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountFo
 from ecommercesite.database import Staff, Users, User, Addproducts, Category, Items_In_Cart, Review, Customer_Payments, Product_Bought
 from flask_login import login_user, current_user, logout_user, login_required
 from functools import wraps
+from datetime import datetime
+from dateutil.relativedelta import *
+import plotly, json
+import plotly.graph_objs as go
+import pandas as pd
+import numpy as np
 
+def trunc_datetime(someDate):
+    return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
 def admin_required(f):
     @wraps(f)
@@ -389,6 +394,38 @@ def customer_database():
     users = Users.query.all()
     return render_template('admin/customer_database.html', users=users)
 
+@app.route('/admin/sales', methods=['GET', 'POST'])
+def sales():
+    oldest_product_bought = Product_Bought.query.first()
+    oldest_my = oldest_product_bought.date_bought.strftime('%Y-%m')
+    current_my = datetime.utcnow().strftime('%Y-%m')
+    counter = oldest_product_bought.date_bought
+    checker = trunc_datetime(counter)
+    total_quantity_by_month = 0
+    saleslist = []
+    all_product_bought = Product_Bought.query.all()
+
+    for product in all_product_bought:
+        pdb = trunc_datetime(product.date_bought)
+        if pdb == checker:
+            total_quantity_by_month += product.quantity
+            print(f"{total_quantity_by_month} \n\n\n\n\n")
+        elif pdb != checker:
+            saleslist.append(total_quantity_by_month)
+            total_quantity_by_month = 0
+            total_quantity_by_month += product.quantity
+            counter = counter + relativedelta(months=+1)
+            checker = trunc_datetime(counter)
+
+    saleslist.append(total_quantity_by_month)
+    x = pd.date_range(oldest_my, current_my, freq='MS') # x axis is gonna be the date
+    y = np.array(saleslist) # y axis gonna be number of sales for each month
+    print(f"{x}, {y} \n\n\n\n\n")
+    df = pd.DataFrame({'x': x, 'y': y})
+
+    data = [go.Line(x=df['x'], y=df['y'])] # assign x as the dataframe column 'x'
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    return render_template('admin/sales.html', plot=graphJSON)
 
 
 #dummy just to let cher see#
