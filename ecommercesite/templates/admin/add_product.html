@@ -9,7 +9,8 @@
                 <div class="col-12">
                   <h2 class="tm-block-title d-inline-block">Add Product</h2>
                 </div>
-                <form method="post" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data", action="">
+                {{ form.hidden_tag() }}
                 <div>
 
                     <div class="row tm-edit-product-row">
@@ -45,20 +46,8 @@
                           </div>
 
                             <div class="form-group mb-3">
-                                <label for="category">Category</label>
-                                <select name="category" id="category" class="form-control" required>
-                                  <option selected =" ">Select category</option>
-                                    <option value="1">New Arrival</option>
-                                    <option value="2">Most Popular</option>
-                                    <option value="3">Limited Time</option>
-                                    <option value="4">Chair</option>
-                                    <option value="5">Table</option>
-                                    <option value="6">Cabinet</option>
-                                    <option value="7">Door</option>
-                                    <option value="8">Bed</option>
-                                    <option value="9">Decoration</option>
-                                    <option value="10">Others</option> 
-                                </select>
+                                <label for="category">{{form.category.label}}</label>
+                                {{form.category(class="form-control")}}
                             </div>
                             
                             <div class="row">
@@ -76,11 +65,19 @@
                         </div>
 
                             <div class="form-group mb-3">
-                            <label for="name">Product Images</label>
+                            <label>{{form.image_1.label}}</label>
                             {{ form.image_1 }}
+                            <hr>
+                            <label>{{form.image_2.label}}</label>
                             {{ form.image_2 }}
+                            <hr>
+                            <label>{{form.image_3.label}}</label>
                             {{ form.image_3 }}
-                            {{ form.image_4 }}  
+                            <hr>
+                            <label>{{form.image_4.label}}</label>
+                            {{ form.image_4 }}
+                            <hr>
+                            <label>{{form.image_5.label}}</label>
                             {{ form.image_5 }}
                             </div>
                 

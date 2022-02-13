@@ -77,7 +77,7 @@
                      <hr>
                      <div class="media product-card">
                         {% for product in cart_items %}
-                        <a class="pull-left" href="product-single.html">
+                        <a class="pull-left" href="">
                             <img src="{{url_for('static',filename='product_pics/' + product.image_1)}}" alt="{{product.name}}" width="50" height="50">
                         </a>
                         <div class="media-body">
@@ -87,26 +87,21 @@
                            <hr>
                         </div>
                         {% endfor %}
-                     </div>
-                     <div class="discount-code">
-                        <p>Have a discount ? <a data-toggle="modal" data-target="#coupon-modal" href="#!">Enter it here</a></p>
-                     </div>
+                     
                      <hr>
                      <ul class="summary_prices">
                         <li>
-                           <span>Subtotal:</span>
+                           <span>Subtotal: SGD {{ subtotal }}</span>
                            <span class="price"></span>
                         </li>
                         <li>
-                           <span>Shipping:</span>
-                           <span>Free</span>
+                           <span>Shipping: SGD 10</span>
+                        </li>
+                        <li>
+                           <span> Total: SGD {{ total }}</span>
                         </li>
                      </ul>
                      <hr>
-                     <div class="summary-total">
-                        <span>Total</span>
-                        <span>$250</span>
-                     </div>
                      <div class="verified-icon">
                         <img src="/static/images/verified.png" width="330" height="38">
                      </div>

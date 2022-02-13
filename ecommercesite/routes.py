@@ -1,19 +1,20 @@
-from ast import Add
-from email.headerregistry import Address
 import secrets, os
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, session, current_app
-from ecommercesite import app, bcrypt, db
-from ecommercesite.forms import LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm, AdminRegisterForm, AddReviewForm, CheckOutForm
+from ecommercesite import app, bcrypt, db, mail
+from ecommercesite.forms import (LoginForm, RegistrationForm, UpdateUserAccountForm, AddproductForm, AdminRegisterForm, 
+                                AddReviewForm, CheckOutForm, UpdateProductForm, RequestResetForm, ResetPasswordForm)
 from ecommercesite.database import Staff, Users, User, Addproducts, Category, Items_In_Cart, Review, Customer_Payments, Product_Bought
 from flask_login import login_user, current_user, logout_user, login_required
+from sqlalchemy import extract
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, date
 from dateutil.relativedelta import *
 import plotly, json
 import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
+from flask_mail import Message
 
 def trunc_datetime(someDate):
     return someDate.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -79,17 +80,67 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message('Password Reset Request', 
+                    sender='CraftyWoodDev@hotmail.com',
+                    recipients=[user.email])
+
+    msg.body = f'''To reset your Crafty Wood account password, visit the following link: 
+                {url_for('reset_token', token=token, _external=True)}
+                If you did not make this request, please ignore this email'''
+    mail.send(msg)
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        send_reset_email(user)
+        flash('A reset password email has been sent.')
+        return redirect(url_for('login'))
+    return render_template('reset_request.html', title='Reset Password', form=form)
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash('Invalid or expired token.', 'warning')
+        return redirect(url_for('reset_request'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        hash_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+        user.password = hash_pw
+        db.session.commit()
+        flash(f'Account has been created, you can now login.', 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_token.html',title='Reset Password' ,form=form)
+
 #--------------------USER-PAGE--------------------------#
 
 @app.route('/')
-@app.route('/home')
+@app.route('/home', methods=['GET', 'POST'])
 def home():
-    return render_template('home.html', title='Home')
+    products = Addproducts.query.filter_by(category_id=2).all()
+    new_arrival_products = Addproducts.query.filter_by(category_id=1).all()
+    return render_template('home.html', title='Home', products=products, new_arrival_products=new_arrival_products)
 
 @app.route('/shop')
 def shop():
     products = Addproducts.query.all()
     return render_template('shop.html', title='Shop', products=products)
+
+@app.route('/search', methods=['GET'])
+def search():
+    keyword = request.args.get('query')
+    products = Addproducts.query.msearch(keyword,fields=['name', 'description'])
+    return render_template("shop.html",title='Search ' + keyword, products=products)
 
 @app.route('/about')
 def about():
@@ -171,7 +222,6 @@ def product_details(id):
         return redirect(url_for('shop'))
     return render_template('product_details.html', title="Product Details", products=products, product_reviews=product_reviews ,form=form, product_bought=product_bought)
 
-
 @app.route('/addcart/<int:id>', methods=['GET', 'POST'])
 @login_required
 def add_to_cart(id):
@@ -198,6 +248,15 @@ def cart():
     cart_items = Items_In_Cart.query.filter_by(user_id=current_user.id).all()
     return render_template('cart.html', title='Shopping Cart', current_user=current_user, cart_items=cart_items)
 
+@app.route('/addquantity/<int:id>', methods=['GET', 'POST'])
+@login_required
+def add_quantity(id):
+    cart_item = Items_In_Cart.query.filter_by(id=id).first()
+    db.session.delete(cart_item)
+    db.session.commit()
+    flash('Item has been deleted.', 'success')
+    return redirect(url_for('checkout_details'))
+
 @app.route('/deletecartcheckout/<int:id>', methods=['GET', 'POST'])
 @login_required
 def delete_cart_item_checkout(id):
@@ -212,6 +271,12 @@ def delete_cart_item_checkout(id):
 def checkout_details():
     form = CheckOutForm()
     cart_items = Items_In_Cart.query.filter_by(user_id=current_user.id).all()
+    subtotal = 0
+    total = 0
+    for item in cart_items:
+        subtotal += item.price
+    
+    total = subtotal + 10
     if form.validate_on_submit():
         full_name = form.full_name.data
         address = form.address.data
@@ -221,13 +286,13 @@ def checkout_details():
         for cart_item in cart_items:
             product = Addproducts.query.filter_by(id=cart_item.product_id).first()
             product.stock = product.stock - cart_item.quantity
-            product_bought = Product_Bought(quantity=cart_item.quantity, product_id=cart_item.product_id, user_id=cart_item.user_id)
+            product_bought = Product_Bought(quantity=cart_item.quantity, product_id=cart_item.product_id, user_id=cart_item.user_id, product_name=cart_item.name, image=cart_item.image_1)
             db.session.add(product_bought)
             db.session.delete(cart_item)
             db.session.commit()
         flash(f'Your order has been submitted!','success')
         return redirect(url_for('thanks'))
-    return render_template('checkout.html', title='Checkout',form=form, cart_items=cart_items)
+    return render_template('checkout.html', title='Checkout',form=form, cart_items=cart_items, subtotal=subtotal, total=total)
 
 
 @app.route('/thanks')
@@ -244,7 +309,7 @@ def thanks():
 def dashboard():
     return render_template('/admin/dashboard.html', title='Dashboard')
 
-def save_product_picture(form_pic):
+def save_product_picture(form_pic, current_picture=None):
     random_hex = secrets.token_hex(10)
     _, f_ext = os.path.splitext(form_pic.filename)
     picture_fn = random_hex + f_ext
@@ -254,6 +319,9 @@ def save_product_picture(form_pic):
     i = Image.open(form_pic)
     i.thumbnail(output_size)
     i.save(picture_path)
+    if current_picture != None:
+        os.remove(os.path.join(app.root_path, "static/profile_pics/", current_picture))
+
     return picture_fn
 
 
@@ -263,20 +331,21 @@ def save_product_picture(form_pic):
 def add_product():
     form = AddproductForm()
     categories = Category.query.all()
-    if request.method=="POST" and 'image_1' in request.files:
+    if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
         length = form.length.data
         width = form.width.data
         depth = form.depth.data
-        category = request.form.get('category')
+        category = form.category.data
         price = form.price.data
         stock = form.stock.data
-        image_1 = save_product_picture(request.files.get('image_1'))
-        image_2 = save_product_picture(request.files.get('image_2'))
-        image_3 = save_product_picture(request.files.get('image_3'))
-        image_4 = save_product_picture(request.files.get('image_4'))
-        image_5 = save_product_picture(request.files.get('image_5'))
+        print(category, "\n\n\n\n\n")
+        image_1 = save_product_picture(form.image_1.data)
+        image_2 = save_product_picture(form.image_2.data)
+        image_3 = save_product_picture(form.image_3.data)
+        image_4 = save_product_picture(form.image_4.data)
+        image_5 = save_product_picture(form.image_5.data)
         add_product = Addproducts(name = name, description = description, length = length, width = width, depth = depth, category_id = category, price = price, stock = stock, image_1 = image_1, image_2 = image_2, image_3 = image_3, image_4 = image_4, image_5 = image_5)
         db.session.add(add_product)
         db.session.commit()
@@ -296,11 +365,11 @@ def display_product():
 @login_required
 @admin_required
 def update_product(id):
-    form = AddproductForm(request.form)
+    form = UpdateProductForm()
     product = Addproducts.query.get_or_404(id)
     categories = Category.query.all()
-    category = request.form.get('category')
-    if request.method =="POST":
+    category = form.category.data
+    if form.validate_on_submit():
         product.name = form.name.data 
         product.description = form.description.data
         product.length = form.length.data
@@ -309,39 +378,40 @@ def update_product(id):
         product.price = form.price.data 
         product.stock = form.stock.data
         product.category_id = category
+        
         if request.files.get('image_1'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_1))
-                product.image_1 = save_product_picture(request.files.get('image_1'))
+                product.image_1 = save_product_picture(request.files.get('image_1'), product.image_1)
             except:
-                product.image_1 = save_product_picture(request.files.get('image_1'))
+                product.image_1 = save_product_picture(request.files.get('image_1'), product.image_1)
         if request.files.get('image_2'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_2))
-                product.image_2 = save_product_picture(request.files.get('image_2'))
+                product.image_2 = save_product_picture(request.files.get('image_2'), product.image_2)
             except:
-                product.image_2 = save_product_picture(request.files.get('image_2'))
+                product.image_2 = save_product_picture(request.files.get('image_2'), product.image_2)
         if request.files.get('image_3'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
-                product.image_3 = save_product_picture(request.files.get('image_3'))
+                product.image_3 = save_product_picture(request.files.get('image_3'), product.image_3)
             except:
-                product.image_3 = save_product_picture(request.files.get('image_3'))
+                product.image_3 = save_product_picture(request.files.get('image_3'), product.image_3)
         if request.files.get('image_4'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
-                product.image_4 = save_product_picture(request.files.get('image_4'))
+                product.image_4 = save_product_picture(request.files.get('image_4'), product.image_4)
             except:
-                product.image_4 = save_product_picture(request.files.get('image_4'))
+                product.image_4 = save_product_picture(request.files.get('image_4'), product.image_4)
         if request.files.get('image_5'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
-                product.image_5 = save_product_picture(request.files.get('image_5'))
+                product.image_5 = save_product_picture(request.files.get('image_5'), product.image_5)
             except:
-                product.image_5 = save_product_picture(request.files.get('image_5'))
+                product.image_5 = save_product_picture(request.files.get('image_5'), product.image_5)
 
-        flash('The product has been updated!','success')
         db.session.commit()
+        flash('The product has been updated!','success')
         return redirect(url_for('display_product'))
     form.name.data = product.name
     form.description.data = product.description
@@ -351,6 +421,7 @@ def update_product(id):
     form.price.data = product.price
     form.stock.data = product.stock
     category = product.category_id
+
     return render_template('admin/add_product.html', form=form, title='Update Product',getproduct=product, categories=categories)
 
 @app.route('/deleteproduct/<int:id>', methods=['POST'])
@@ -387,29 +458,29 @@ def admin_register():
         db.session.commit()
         flash(f'Account has been created, you can now login.', 'success')
         return redirect(url_for('home'))
-    return render_template('admin/admin_register.html', form=form)
+    return render_template('admin/admin_register.html', form=form, title='Admin Registration')
 
 @app.route('/admin/customer_database')
+@login_required
+@admin_required
 def customer_database():
     users = Users.query.all()
-    return render_template('admin/customer_database.html', users=users)
+    return render_template('admin/customer_database.html', users=users, title='Customer Database')
 
-@app.route('/admin/sales', methods=['GET', 'POST'])
-def sales():
+def create_graph():
     oldest_product_bought = Product_Bought.query.first()
-    oldest_my = oldest_product_bought.date_bought.strftime('%Y-%m')
+    oldest_my = oldest_product_bought.datetime_bought.strftime('%Y-%m')
     current_my = datetime.utcnow().strftime('%Y-%m')
-    counter = oldest_product_bought.date_bought
+    counter = oldest_product_bought.datetime_bought
     checker = trunc_datetime(counter)
     total_quantity_by_month = 0
     saleslist = []
     all_product_bought = Product_Bought.query.all()
 
     for product in all_product_bought:
-        pdb = trunc_datetime(product.date_bought)
+        pdb = trunc_datetime(product.datetime_bought)
         if pdb == checker:
             total_quantity_by_month += product.quantity
-            print(f"{total_quantity_by_month} \n\n\n\n\n")
         elif pdb != checker:
             saleslist.append(total_quantity_by_month)
             total_quantity_by_month = 0
@@ -420,15 +491,25 @@ def sales():
     saleslist.append(total_quantity_by_month)
     x = pd.date_range(oldest_my, current_my, freq='MS') # x axis is gonna be the date
     y = np.array(saleslist) # y axis gonna be number of sales for each month
-    print(f"{x}, {y} \n\n\n\n\n")
     df = pd.DataFrame({'x': x, 'y': y})
 
     data = [go.Line(x=df['x'], y=df['y'])] # assign x as the dataframe column 'x'
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
-    return render_template('admin/sales.html', plot=graphJSON)
+    return graphJSON
 
-
-#dummy just to let cher see#
-@app.route('/oceanus')
-def oceanus():
-    return render_template('oceanus.html', title = "Product Details")
+@app.route('/admin/sales')
+@login_required
+@admin_required
+def sales():
+    line_graph = create_graph()
+    current_year = datetime.utcnow().year
+    current_month = datetime.utcnow().month
+    current_date = date.today()
+    current_day_products = Product_Bought.query.filter_by(date_bought=current_date).all()
+    current_month_total = Product_Bought.query.filter(extract('year', Product_Bought.date_bought) == current_year, extract('month', Product_Bought.date_bought) == current_month).all()
+    total_count = 0
+    total_profit = 0
+    for product in current_month_total:
+        total_count += product.quantity
+        total_profit += product.price
+    return render_template('admin/sales.html',title='Sales Report' ,plot=line_graph, total_count=total_count, total_profit=total_profit, current_day_products=current_day_products)

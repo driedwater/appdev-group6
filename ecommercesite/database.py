@@ -1,7 +1,8 @@
-from ecommercesite import db, login_manager
-from itsdangerous import TimedSerializer as Serializer
+from email.policy import default
+from ecommercesite import db, login_manager, app
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, date
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -24,6 +25,20 @@ class User(db.Model, UserMixin):
         'polymorphic_on':type,
         'polymorphic_identity':'user'
     }
+
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    def verify_reset_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+
+        return User.query.get(user_id)
+
 
     def __repr__(self):
         return f"User( '{self.username}', '{self.email}')"
@@ -55,8 +70,12 @@ class Staff(User):
 class Product_Bought(db.Model):
     __tablename__ = 'product_bought'
     id = db.Column(db.Integer, primary_key=True)
+    product_name = db.Column(db.String(80), nullable=False)
+    image = db.Column(db.String(150), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    date_bought = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    price = db.Column(db.Numeric(10,2), nullable=False)
+    date_bought = db.Column(db.Date, nullable=False, default=date.today)
+    datetime_bought = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     product_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
@@ -82,7 +101,7 @@ class Review(db.Model):
 
 
 class Addproducts(db.Model):
-    __seachbale__ = ['name','description']
+    __searchable__ = ['name','description']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.Text, nullable=False)
@@ -111,7 +130,7 @@ class Category(db.Model):
     
 
     def __repr__(self):
-        return '<Category %r>' % self.name
+        return f"{self.name}"
 
 class Customer_Payments(db.Model):
     id = db.Column(db.Integer, primary_key=True)

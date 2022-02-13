@@ -18,7 +18,7 @@
                       <th class="">Item Name</th>
                       <th class="">Item Price</th>
                       <th class="">Quantity</th>
-                      <th class="">Actions</th>
+                      <th class=""></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -30,10 +30,12 @@
                           <a href="#!">{{ product.name }}</a>
                         </div>
                       </td>
-                      <td class="">{{ product.price }}</td>
-                      <td class="">{{ product.quantity }}</td>
+                      <td class="text-center">{{ product.price }}</td>
+                      <td class="text-center container"> 
+                        <a href="#">-</a> {{ product.quantity }} <a href="#">+</a> 
+                      </td>
                       <td class="">
-                        <a class="product-remove" href="{{ url_for('delete_cart', id=product.id)}}">Remove</a>
+                        <a class="product-remove text-center" style="text-decoration: underline" href="{{ url_for('delete_cart', id=product.id)}}">Remove</a>
                       </td>
                     </tr>
 
@@ -49,10 +51,18 @@
   </div>
 </div>
 
+{% if cart_items %}
 <div class="container text-center">
   <p>
     <a class="btn btn-primary" href="{{ url_for('checkout_details')}}">Checkout</a>
   </p>
 </div>
+{% else %}
+<div class="container text-center">
+  <p>
+    Add items to your cart to checkout!
+  </p>
+</div>
+{% endif %}
 
 {% endblock %}

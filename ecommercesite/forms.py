@@ -6,9 +6,9 @@ from wtforms import StringField, SubmitField, PasswordField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from ecommercesite.database import Users, User, Staff
+from ecommercesite.database import Users, User, Staff, Addproducts, Category
 from flask_login import current_user
-from wtforms import Form, SubmitField, IntegerField, FloatField, StringField, TextAreaField, validators, SelectField
+from wtforms import SubmitField, IntegerField, FloatField, StringField, TextAreaField, validators, SelectField, BooleanField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 class RegistrationForm(FlaskForm):
@@ -33,6 +33,7 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
     password = StringField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 class UpdateUserAccountForm(FlaskForm):
@@ -55,23 +56,50 @@ class UpdateUserAccountForm(FlaskForm):
             if user:
                 raise ValidationError('email is taken.')
 
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+    def validate_email(self, email):
+        user = Users.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError(f'There is no account named {email.data}.')
+
+class ResetPasswordForm(FlaskForm):
+    password = StringField('Password', validators=[DataRequired()])
+    confirm_password = StringField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset Password')
 
 class AddproductForm(FlaskForm):
+    name = StringField('Product Name', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    category = SelectField('Category', validators=[DataRequired()], choices=[(1, 'New Arrival'), (2, 'Most Popular'), (3, '	Limited Time'), (4, 'Chair'), (5, 'Table'), (6, 'Cabinet'), (7, 'Door'), (8, 'Bed'), (9, 'Decoration'), (10, 'Others')])
+    price = FloatField('Price', validators=[DataRequired()])
+    stock = IntegerField('Stock', validators=[DataRequired()])
+    length = IntegerField('Length', validators=[DataRequired()])
+    width = IntegerField('Width', validators=[DataRequired()])
+    depth = IntegerField('Depth', validators=[DataRequired()])
+    image_1 = FileField('Cover Image', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    image_2 = FileField('Image 2', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    image_3 = FileField('Image 3', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    image_4 = FileField('Image 4', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    image_5 = FileField('Image 5', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    submit = SubmitField("Add product")
+
+class UpdateProductForm(FlaskForm):
     name = StringField('Product Name', [validators.DataRequired()])
     description = TextAreaField('Description', [validators.DataRequired()])
-    category = SelectField('Category', [validators.DataRequired()])
+    category = SelectField('Category', validators=[DataRequired()], choices=[(1, 'New Arrival'), (2, 'Most Popular'), (3, '	Limited Time'), (4, 'Chair'), (5, 'Table'), (6, 'Cabinet'), (7, 'Door'), (8, 'Bed'), (9, 'Decoration'), (10, 'Others')])
     price = FloatField('Price', [validators.DataRequired()])
     stock = IntegerField('Stock', [validators.DataRequired()])
     length = IntegerField('Length', [validators.DataRequired()])
     width = IntegerField('Width', [validators.DataRequired()])
     depth = IntegerField('Depth', [validators.DataRequired()])
-    image_1 = FileField('Image 1', validators=[FileRequired(), FileAllowed(['jpg','png','gif','jpeg'])])
+    image_1 = FileField('Cover Image', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
     image_2 = FileField('Image 2', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
     image_3 = FileField('Image 3', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
     image_4 = FileField('Image 4', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
     image_5 = FileField('Image 5', validators=[FileAllowed(['jpg','png','gif','jpeg'])])
-    submit = SubmitField("Add product")
-
+    submit = SubmitField("Update Product")
 
 class AdminRegisterForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])

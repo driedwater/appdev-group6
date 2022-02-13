@@ -1763,3 +1763,9 @@ h1, h2, h3, h4, h5, h6, figure {
 input {
   margin: 0 0.5rem 0 0.5rem;
 }
+
+#about-pic{
+  position: absolute;
+  right: -800px;
+  top: -400px;
+}

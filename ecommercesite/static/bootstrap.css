@@ -6254,4 +6254,26 @@ button.close {
   }
 }
 
+.panel-body { 
+  padding-top:20px; 
+  text-align: center;
+  display: block;
+}
+
+.panel-body .btn:not(.btn-block) { 
+  width:220px;
+  margin-bottom:10px; 
+  text-align: center;
+  }
+
+
+#panel-spacing{
+  margin: auto;
+  width: 70%;
+  border: 3px solid black;
+  padding: 10px;
+  right: -180px;
+  text-align: center;
+}
+
 /*# sourceMappingURL=bootstrap.css.map */

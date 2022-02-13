@@ -1,31 +1,33 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-
 <div class="container">
 
 <h2 class='text-center'>Welcome back, {{ current_user.username }}.</h2>
 <u><h2 class='text-center'>Dashboard</h2><u>
 <hr>
 
-<form>
-    <fieldset style='border: 1px solid rgb(22, 0, 0);'>
+<div class="panel-container">
     <div class="row">
-        <div class="col-sm-3 col-md-offset-1">
-        <a class="btn btn-primary" href="{{url_for('admin_register')}}" role="button">Admin Register</a>    
-        </div>
-        <div class="col-sm-3 col-md-offset-1">
-        <a class="btn btn-primary" href="{{url_for('add_product')}}" role="button">Add Product</a>
-        </div>
-        <div class="col-sm-3 col-md-offset-1">
-        <a class="btn btn-primary" href="{{url_for('display_product')}}" role="button">Product List</a>
-        </div>
-        <div class="col-sm-3 col-md-offset-1">
-            <a class="btn btn-primary" href="{{url_for('customer_database')}}" role="button">Customer<br> Database</a>
+        <div class="col-md-6" id="panel-spacing">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-6 col-lg-6">
+                            <a href="{{url_for('admin_register')}}" class="btn btn-primary btn-lg" role="button"><br/>Admin Register</a>
+                            <a href="{{url_for('account')}}" class="btn btn-primary btn-lg" role="button"><br/>Admin Account</a>
+                            <a href="{{url_for('customer_database')}}" class="btn btn-primary btn-lg" role="button"><br/>Customer Database</a>
+                          </div>
+                        <div class="col-xs-6 col-lg-6">
+                          <a href="{{url_for('add_product')}}" class="btn btn-primary btn-lg" role="button"><br/>Add Product</a>
+                          <a href="{{url_for('display_product')}}" class="btn btn-primary btn-lg" role="button"><br/>Product List</a>
+                          <a href="{{url_for('sales')}}" class="btn btn-primary btn-lg" role="button"><br/>Sales Report</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</fieldset>
-</form>
+</div>
 
 
 </div>
