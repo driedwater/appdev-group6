@@ -17,8 +17,11 @@
 
 <div class="input-wrapper">
 	<div class= "search_function">
-	<a href="single.html" class="icon"><i class="icon icon-search"></i></a>
-	<input type="text" placeholder="Search"/>
+		<form method="GET" action="/search">
+			<input type="text" name="query" placeholder="Search"/>
+			<button type="submit" class="btn btn-light-primary font-weight-bold"><i class="icon icon-search"></i></button>
+		</form>
+	
 	</div>
 </div><svg class="icon icon-close"><use xlink:href="#icon-close"></use></svg>
 

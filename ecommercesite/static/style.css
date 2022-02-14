@@ -325,7 +325,7 @@ h1, h2, h3, h4, h5, h6, figure {
   z-index: 1000;
 }
 #fh5co-hero .flexslider .flex-control-nav li a {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
   box-shadow: none;
   width: 12px;
   height: 12px;
@@ -333,7 +333,7 @@ h1, h2, h3, h4, h5, h6, figure {
 }
 #fh5co-hero .flexslider .flex-control-nav li a.flex-active {
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(129, 129, 129, 0.74);
 }
 #fh5co-hero .flexslider .flex-direction-nav {
   display: none;

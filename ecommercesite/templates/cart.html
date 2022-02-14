@@ -27,12 +27,12 @@
                       <td class="">
                         <div class="product-info">
                           <img width="80" src="{{url_for('static', filename='product_pics/' + product.image_1)}}" alt="" />
-                          <a href="#!">{{ product.name }}</a>
+                          <a href="{{ url_for('product_details', id=product.product_id) }}">{{ product.name }}</a>
                         </div>
                       </td>
                       <td class="text-center">{{ product.price }}</td>
-                      <td class="text-center container"> 
-                        <a href="#">-</a> {{ product.quantity }} <a href="#">+</a> 
+                      <td class="text-center col-md-2"> 
+                        <a href="{{ url_for('add_quantity', id=product.id) }}">+</a> {{ product.quantity }} <a href="{{ url_for('min_quantity', id=product.id) }}">-</a> 
                       </td>
                       <td class="">
                         <a class="product-remove text-center" style="text-decoration: underline" href="{{ url_for('delete_cart', id=product.id)}}">Remove</a>
@@ -45,7 +45,7 @@
               </form>
             </div>
           </div>
-        </div>
+        </div>  
       </div>
     </div>
   </div>
