@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-<header id="fh5co-header" class="fh5co-cover fh5co-cover-sm" role="banner" style="background-image:url(static/images/potholder.png);">
+<header id="fh5co-header" class="fh5co-cover fh5co-cover-sm" role="banner" style="background-image:url(static/images/img_bg_1.jpg);">
 	<div class="overlay"></div>
 	<div class="container">
 		<div class="row">
@@ -17,8 +17,11 @@
 
 <div class="input-wrapper">
 	<div class= "search_function">
-	<a href="single.html" class="icon"><i class="icon icon-search"></i></a>
-	<input type="text" placeholder="Search"/>
+		<form method="GET" action="/search">
+			<input type="text" name="query" placeholder="Search"/>
+			<button type="submit" class="btn btn-light-primary font-weight-bold"><i class="icon icon-search"></i></button>
+		</form>
+	
 	</div>
 </div><svg class="icon icon-close"><use xlink:href="#icon-close"></use></svg>
 

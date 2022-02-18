@@ -129,11 +129,13 @@ def reset_token(token):
 def home():
     products = Addproducts.query.filter_by(category_id=2).all()
     new_arrival_products = Addproducts.query.filter_by(category_id=1).all()
+    
     return render_template('home.html', title='Home', products=products, new_arrival_products=new_arrival_products)
 
 @app.route('/shop')
 def shop():
     products = Addproducts.query.all()
+    
     return render_template('shop.html', title='Shop', products=products)
 
 @app.route('/search', methods=['GET'])
@@ -144,14 +146,17 @@ def search():
 
 @app.route('/about')
 def about():
+    
     return render_template('about.html', title='About')
 
 @app.route('/services')
 def services():
+    
     return render_template('service.html', title='Services')
 
 @app.route('/contacts')
 def contacts():
+    
     return render_template('contacts.html', title='Contacts')
 
 def save_picture(form_pic, current_picture):
@@ -225,12 +230,18 @@ def product_details(id):
 @app.route('/addcart/<int:id>', methods=['GET', 'POST'])
 @login_required
 def add_to_cart(id):
-    products = Addproducts.query.get_or_404(id)
-    cart = Items_In_Cart(image_1=products.image_1, name=products.name, price=products.price, user_id=current_user.id, product_id=products.id)
-    db.session.add(cart)
-    db.session.commit()
-    flash('Item has been added to cart!', 'success')
-    return redirect(url_for('shop'))
+    cart_item = Items_In_Cart.query.filter_by(product_id=id, user_id=current_user.id).first()
+    products = Addproducts.query.filter_by(id=id).first()
+    
+    if cart_item:
+        flash('This item is already in your cart!', 'danger')
+        return redirect(url_for('shop'))
+    else:
+        cart = Items_In_Cart(image_1=products.image_1, name=products.name, price=products.price, user_id=current_user.id, product_id=id)
+        db.session.add(cart)
+        db.session.commit()
+        flash('Item has been added to cart!', 'success')
+        return redirect(url_for('shop'))
 
 @app.route('/deletecart/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -246,16 +257,34 @@ def delete_cart(id):
 @login_required
 def cart():
     cart_items = Items_In_Cart.query.filter_by(user_id=current_user.id).all()
-    return render_template('cart.html', title='Shopping Cart', current_user=current_user, cart_items=cart_items)
+    items = 0
+    for item in cart_items:
+        items += 1
+    return render_template('cart.html', title='Shopping Cart', current_user=current_user, cart_items=cart_items, items=items)
 
 @app.route('/addquantity/<int:id>', methods=['GET', 'POST'])
 @login_required
 def add_quantity(id):
-    cart_item = Items_In_Cart.query.filter_by(id=id).first()
-    db.session.delete(cart_item)
+    cart_item = Items_In_Cart.query.filter_by(id=id, user_id=current_user.id).first()
+    cart_item.quantity += 1
     db.session.commit()
-    flash('Item has been deleted.', 'success')
-    return redirect(url_for('checkout_details'))
+    flash('Item quantity has increased.', 'success')
+    return redirect(url_for('cart'))
+    
+@app.route('/minquantity/<int:id>', methods=['GET', 'POST'])
+@login_required
+def min_quantity(id):
+    cart_item = Items_In_Cart.query.filter_by(id=id, user_id=current_user.id).first()
+    cart_item.quantity -= 1
+    if cart_item.quantity < 1:
+        db.session.delete(cart_item)
+        db.session.commit()
+        flash('Item quantity has removed.', 'success')
+        return redirect(url_for('cart'))
+    else:
+        db.session.commit()
+        flash('Item quantity has decreased.', 'success')
+        return redirect(url_for('cart'))
 
 @app.route('/deletecartcheckout/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -274,7 +303,12 @@ def checkout_details():
     subtotal = 0
     total = 0
     for item in cart_items:
-        subtotal += item.price
+        product = Addproducts.query.filter_by(id=item.product_id).first()
+        if product.stock < item.quantity:
+            flash('{{product.name}} only has {{product.stock}} left in stock', 'danger')
+            return redirect(url_for('cart'))
+        else:
+            subtotal += item.price
     
     total = subtotal + 10
     if form.validate_on_submit():
@@ -286,7 +320,7 @@ def checkout_details():
         for cart_item in cart_items:
             product = Addproducts.query.filter_by(id=cart_item.product_id).first()
             product.stock = product.stock - cart_item.quantity
-            product_bought = Product_Bought(quantity=cart_item.quantity, product_id=cart_item.product_id, user_id=cart_item.user_id, product_name=cart_item.name, image=cart_item.image_1)
+            product_bought = Product_Bought(quantity=cart_item.quantity, product_id=cart_item.product_id, user_id=cart_item.user_id, product_name=cart_item.name, image=cart_item.image_1, price=cart_item.price)
             db.session.add(product_bought)
             db.session.delete(cart_item)
             db.session.commit()
@@ -309,7 +343,7 @@ def thanks():
 def dashboard():
     return render_template('/admin/dashboard.html', title='Dashboard')
 
-def save_product_picture(form_pic, current_picture=None):
+def save_product_picture(form_pic):
     random_hex = secrets.token_hex(10)
     _, f_ext = os.path.splitext(form_pic.filename)
     picture_fn = random_hex + f_ext
@@ -319,8 +353,6 @@ def save_product_picture(form_pic, current_picture=None):
     i = Image.open(form_pic)
     i.thumbnail(output_size)
     i.save(picture_path)
-    if current_picture != None:
-        os.remove(os.path.join(app.root_path, "static/profile_pics/", current_picture))
 
     return picture_fn
 
@@ -382,33 +414,33 @@ def update_product(id):
         if request.files.get('image_1'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_1))
-                product.image_1 = save_product_picture(request.files.get('image_1'), product.image_1)
+                product.image_1 = save_product_picture(request.files.get('image_1'))
             except:
-                product.image_1 = save_product_picture(request.files.get('image_1'), product.image_1)
+                product.image_1 = save_product_picture(request.files.get('image_1'))
         if request.files.get('image_2'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_2))
-                product.image_2 = save_product_picture(request.files.get('image_2'), product.image_2)
+                product.image_2 = save_product_picture(request.files.get('image_2'))
             except:
-                product.image_2 = save_product_picture(request.files.get('image_2'), product.image_2)
+                product.image_2 = save_product_picture(request.files.get('image_2'))
         if request.files.get('image_3'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
-                product.image_3 = save_product_picture(request.files.get('image_3'), product.image_3)
+                product.image_3 = save_product_picture(request.files.get('image_3'))
             except:
-                product.image_3 = save_product_picture(request.files.get('image_3'), product.image_3)
+                product.image_3 = save_product_picture(request.files.get('image_3'))
         if request.files.get('image_4'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
-                product.image_4 = save_product_picture(request.files.get('image_4'), product.image_4)
+                product.image_4 = save_product_picture(request.files.get('image_4'))
             except:
-                product.image_4 = save_product_picture(request.files.get('image_4'), product.image_4)
+                product.image_4 = save_product_picture(request.files.get('image_4'))
         if request.files.get('image_5'):
             try:
                 os.unlink(os.path.join(current_app.root_path, "static/images/" + product.image_3))
-                product.image_5 = save_product_picture(request.files.get('image_5'), product.image_5)
+                product.image_5 = save_product_picture(request.files.get('image_5'))
             except:
-                product.image_5 = save_product_picture(request.files.get('image_5'), product.image_5)
+                product.image_5 = save_product_picture(request.files.get('image_5'))
 
         db.session.commit()
         flash('The product has been updated!','success')
