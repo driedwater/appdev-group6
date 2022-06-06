@@ -26,4 +26,4 @@ app.config['MAIL_USERNAME'] = 'CraftyWoodDev@hotmail.com'
 app.config['MAIL_PASSWORD'] = 'outlook0appdev'
 mail = Mail(app)
 
-from ecommercesite import routes
+from bankingsite import routes

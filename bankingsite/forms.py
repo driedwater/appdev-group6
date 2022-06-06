@@ -6,7 +6,7 @@ from wtforms import StringField, SubmitField, PasswordField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from ecommercesite.database import Users, User, Staff, Addproducts, Category
+from bankingsite.database import Users, User, Staff, Addproducts, Category
 from flask_login import current_user
 from wtforms import SubmitField, IntegerField, FloatField, StringField, TextAreaField, validators, SelectField, BooleanField
 from flask_wtf.file import FileField, FileRequired, FileAllowed

@@ -1,5 +1,5 @@
 from email.policy import default
-from ecommercesite import db, login_manager, app
+from bankingsite import db, login_manager, app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_login import UserMixin
 from datetime import datetime, date

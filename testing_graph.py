@@ -1,5 +1,5 @@
-from ecommercesite import db
-from ecommercesite.database import Product_Bought
+from bankingsite import db
+from bankingsite.database import Product_Bought
 from datetime import datetime, date
 #db.create_all()
 
