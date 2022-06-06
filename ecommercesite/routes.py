@@ -531,6 +531,7 @@ def create_graph():
 
 @app.route('/admin/sales')
 @login_required
+@admin_required
 def sales():
     line_graph = create_graph()
     current_year = datetime.utcnow().year
