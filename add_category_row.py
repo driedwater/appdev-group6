@@ -1,5 +1,5 @@
-from ecommercesite import db
-from ecommercesite.database import Category
+from bankingsite import db
+from bankingsite.database import Category
 
 db.create_all()
 
